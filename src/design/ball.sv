@@ -21,6 +21,10 @@ module  ball
     input  logic        frame_clk,
     input  logic [7:0]  keycode,
 
+    input  logic logic_in_air,
+    input  logic touch_down,
+    input  logic [9:0] touch_down_position_y,
+
     output logic [9:0]  BallX, 
     output logic [9:0]  BallY, 
     output logic [9:0]  BallS 
@@ -37,13 +41,20 @@ module  ball
     parameter [9:0] Ball_X_Step=1;      // Step size on the X axis
     parameter [9:0] Ball_Y_Step=1;      // Step size on the Y axis
 
-    logic [9:0] Ball_X_Motion;
     logic [9:0] Ball_X_Motion_next;
-    logic [9:0] Ball_Y_Motion;
     logic [9:0] Ball_Y_Motion_next;
-
     logic [9:0] Ball_X_next;
     logic [9:0] Ball_Y_next;
+
+    logic [9:0] curr_speed;
+    logic [9:0] gravity;
+    logic [9:0] go_up;
+
+    initial begin
+        curr_speed = 10'd0;
+        gravity = 10'd1;
+        go_up = 0;
+    end
 
     always_comb begin
         Ball_Y_Motion_next = 10'd0; // set default motion to be same as prev clock cycle 
@@ -51,27 +62,50 @@ module  ball
 
         //modify to control ball motion with the keycode
         if (keycode == 8'h1A) begin
-            Ball_Y_Motion_next = -10'd1;
-            Ball_X_Motion_next = 10'd0;
+            Ball_Y_Motion_next = -10'd7;
+            go_up = 1;
         end
         else if (keycode == 8'h16) begin
-            Ball_Y_Motion_next = 10'd1; 
-            Ball_X_Motion_next = 10'd0; 
+            Ball_X_Motion_next = 10'd0;
+            go_up = 0;
         end        
         else if (keycode == 8'h07) begin
-            Ball_X_Motion_next = 10'd1; 
-            Ball_Y_Motion_next = 10'd0;
+            Ball_X_Motion_next = 10'd1;
+            go_up = 0;
         end
         else if (keycode == 8'h04) begin
             Ball_X_Motion_next = -10'd1;
+            go_up = 0;
+        end
+        else begin
+            go_up = 0;
+        end
+
+        if (logic_in_air == 1 && go_up == 0) begin
+            Ball_Y_Motion_next = curr_speed + gravity;
+            curr_speed = Ball_Y_Motion_next;
+            if (curr_speed > 10'd3) begin
+                curr_speed = 10'd3;
+            end
+        end
+        else begin
+            curr_speed = 10'd0;
+        end
+        
+        if (touch_down == 1) begin
+            Ball_Y_Motion_next = touch_down_position_y - BallY;
+        end
+
+        if ((BallY + BallS) >= Ball_Y_Max & keycode != 8'h1A)
+        begin
             Ball_Y_Motion_next = 10'd0;
         end
 
-        if ( (BallY + BallS) >= Ball_Y_Max )  // Ball is at the bottom edge, BOUNCE!
-        begin
-            Ball_Y_Motion_next = (~ (Ball_Y_Step) + 1'b1);  // set to -1 via 2's complement.
-        end
-        else if ( (BallY - BallS) <= Ball_Y_Min )  // Ball is at the top edge, BOUNCE!
+        //if ( (BallY + BallS) >= Ball_Y_Max )  // Ball is at the bottom edge, BOUNCE!
+        //begin
+        //    Ball_Y_Motion_next = (~ (Ball_Y_Step) + 1'b1);  // set to -1 via 2's complement.
+        //end
+        if ( (BallY - BallS) <= Ball_Y_Min )  // Ball is at the top edge, BOUNCE!
         begin
             Ball_Y_Motion_next = Ball_Y_Step;
         end 
@@ -95,21 +129,13 @@ module  ball
     begin: Move_Ball
         if (Reset)
         begin 
-            Ball_Y_Motion <= 10'd0; //Ball_Y_Step;
-			Ball_X_Motion <= 10'd0; //Ball_X_Step;
-            
 			BallY <= Ball_Y_Center;
 			BallX <= Ball_X_Center;
         end
         else 
         begin 
-
-			Ball_Y_Motion <= 10'd0; 
-			Ball_X_Motion <= 10'd0; 
-
             BallY <= Ball_Y_next;  // Update ball position
             BallX <= Ball_X_next;
-			
 		end  
     end
 

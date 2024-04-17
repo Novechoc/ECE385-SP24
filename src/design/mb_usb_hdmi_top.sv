@@ -48,6 +48,14 @@ module mb_usb_hdmi_top(
     logic hsync, vsync, vde;
     logic [3:0] red, green, blue;
     logic reset_ah;
+
+    //World Map
+    logic [28:0] info_ground[16];
+
+    //Logic Block
+    logic logic_in_air;
+    logic touch_down;
+    logic [9:0] touch_down_position_y;
     
     assign reset_ah = reset_rtl_0;
     
@@ -141,7 +149,11 @@ module mb_usb_hdmi_top(
         .keycode(keycode0_gpio[7:0]),    //Notice: only one keycode connected to ball by default
         .BallX(ballxsig),
         .BallY(ballysig),
-        .BallS(ballsizesig)
+        .BallS(ballsizesig),
+
+        .logic_in_air(logic_in_air),
+        .touch_down(touch_down),
+        .touch_down_position_y(touch_down_position_y)
     );
     
     //Color Mapper Module   
@@ -155,5 +167,23 @@ module mb_usb_hdmi_top(
         .Green(green),
         .Blue(blue)
     );
+
+    world_map world_map_instance(
+        .Reset(reset_ah),
+        .info_ground(info_ground)
+    );
+
+    logic_block logic_block_instance(
+        .pixel_clk(clk_25MHz),
+        .reset(reset_ah),
+        .BallX(ballxsig),
+        .BallY(ballysig),
+        .BallS(ballsizesig),
+        .logic_in_air(logic_in_air),
+        .info_ground(info_ground),
+        .touch_down(touch_down),
+        .touch_down_position_y(touch_down_position_y)
+    );
+    
     
 endmodule
