@@ -30,11 +30,13 @@ proc checkRequiredFiles { origin_dir} {
   }
 
   set files [list \
- "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/Color_Mapper.sv"]"\
- "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/VGA_controller.sv"]"\
- "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/ball.sv"]"\
- "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/hex_driver.sv"]"\
- "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/mb_usb_hdmi_top.sv"]"\
+ "[file normalize "$origin_dir/src/design/Color_Mapper.sv"]"\
+ "[file normalize "$origin_dir/src/design/VGA_controller.sv"]"\
+ "[file normalize "$origin_dir/src/design/ball.sv"]"\
+ "[file normalize "$origin_dir/src/design/hex_driver.sv"]"\
+ "[file normalize "$origin_dir/src/design/logic.sv"]"\
+ "[file normalize "$origin_dir/src/design/world_map.sv"]"\
+ "[file normalize "$origin_dir/src/design/mb_usb_hdmi_top.sv"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/constrs_1/imports/pin_assignment/mb_usb_hdmi_top.xdc"]"\
   ]
   foreach ifile $files {
@@ -195,36 +197,48 @@ if { $obj != {} } {
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
 set files [list \
- [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/imports/design/Color_Mapper.sv"] \
- [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/imports/design/VGA_controller.sv"] \
- [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/imports/design/ball.sv"] \
- [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/imports/design/hex_driver.sv"] \
- [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/imports/design/mb_usb_hdmi_top.sv"] \
+ [file normalize "${origin_dir}/src/design/Color_Mapper.sv"] \
+ [file normalize "${origin_dir}/src/design/VGA_controller.sv"] \
+ [file normalize "${origin_dir}/src/design/ball.sv"] \
+ [file normalize "${origin_dir}/src/design/hex_driver.sv"] \
+ [file normalize "${origin_dir}/src/design/logic.sv"] \
+ [file normalize "${origin_dir}/src/design/world_map.sv"] \
+ [file normalize "${origin_dir}/src/design/mb_usb_hdmi_top.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
 
 # Set 'sources_1' fileset file properties for remote files
-set file "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/Color_Mapper.sv"
+set file "$origin_dir/src/design/Color_Mapper.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/VGA_controller.sv"
+set file "$origin_dir/src/design/VGA_controller.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/ball.sv"
+set file "$origin_dir/src/design/ball.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/hex_driver.sv"
+set file "$origin_dir/src/design/hex_driver.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/vivado_project/final_project.srcs/sources_1/imports/design/mb_usb_hdmi_top.sv"
+set file "$origin_dir/src/design/logic.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/design/world_map.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/design/mb_usb_hdmi_top.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -236,6 +250,7 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
 set_property -name "top" -value "mb_usb_hdmi_top" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
@@ -310,7 +325,7 @@ set obj [get_filesets sim_1]
 
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
-set_property -name "top" -value "mb_usb_hdmi_top" -objects $obj
+set_property -name "top" -value "mb_block_wrapper" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
 # Set 'utils_1' fileset object
