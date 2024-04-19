@@ -49,7 +49,7 @@ module  color_mapper ( input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
                 x_start = info_ground[i][9:0];
                 y_loc = info_ground[i][18:10];
                 length = info_ground[i][28:19];
-                if ((DrawY >= y_loc - 2) && (DrawY <= y_loc + 2) && (DrawX >= x_start) && (DrawX <= x_start + length)) begin
+                if ((DrawY >= y_loc - 2) && (DrawY <= y_loc + 1) && (DrawX >= x_start) && (DrawX <= x_start + length)) begin
                     ground_on = 1'b1;
                     ground_flag = 1'b1;
                     break;

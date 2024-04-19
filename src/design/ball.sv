@@ -19,15 +19,17 @@ module  ball
 ( 
     input  logic        Reset, 
     input  logic        frame_clk,
-    input  logic [7:0]  keycode,
+    input  logic [31:0]  keycode,
 
     input  logic logic_in_air,
-    input  logic touch_down,
+    input  logic touch_down, touch_up,
     input  logic [9:0] touch_down_position_y,
+    input  logic [9:0] touch_up_position_y,
 
     output logic [9:0]  BallX, 
     output logic [9:0]  BallY, 
-    output logic [9:0]  BallS 
+    output logic [9:0]  BallS,
+    output logic [9:0]  go_up 
 );
     
 
@@ -36,7 +38,7 @@ module  ball
     parameter [9:0] Ball_Y_Center=240;  // Center position on the Y axis
     parameter [9:0] Ball_X_Min=0;       // Leftmost point on the X axis
     parameter [9:0] Ball_X_Max=639;     // Rightmost point on the X axis
-    parameter [9:0] Ball_Y_Min=0;       // Topmost point on the Y axis
+    parameter [9:0] Ball_Y_Min=7;       // Topmost point on the Y axis
     parameter [9:0] Ball_Y_Max=479;     // Bottommost point on the Y axis
     parameter [9:0] Ball_X_Step=1;      // Step size on the X axis
     parameter [9:0] Ball_Y_Step=1;      // Step size on the Y axis
@@ -48,7 +50,12 @@ module  ball
 
     logic [9:0] curr_speed;
     logic [9:0] gravity;
-    logic [9:0] go_up;
+
+    logic [7:0] keycode1, keycode2, keycode3, keycode4;
+    assign keycode1 = keycode[7:0];
+    assign keycode2 = keycode[15:8];
+    assign keycode3 = keycode[23:16];
+    assign keycode4 = keycode[31:24];
 
     initial begin
         curr_speed = 10'd0;
@@ -61,19 +68,15 @@ module  ball
         Ball_X_Motion_next = 10'd0;
 
         //modify to control ball motion with the keycode
-        if (keycode == 8'h1A) begin
-            Ball_Y_Motion_next = -10'd7;
-            go_up = 1;
-        end
-        else if (keycode == 8'h16) begin
+        if (keycode1 == 8'h16 || keycode2 == 8'h16 || keycode3 == 8'h16 || keycode4 == 8'h16) begin
             Ball_X_Motion_next = 10'd0;
             go_up = 0;
         end        
-        else if (keycode == 8'h07) begin
+        else if (keycode1 == 8'h07 || keycode2 == 8'h07 || keycode3 == 8'h07 || keycode4 == 8'h07) begin
             Ball_X_Motion_next = 10'd1;
             go_up = 0;
         end
-        else if (keycode == 8'h04) begin
+        else if (keycode1 == 8'h04 || keycode2 == 8'h04 || keycode3 == 8'h04 || keycode4 == 8'h04) begin
             Ball_X_Motion_next = -10'd1;
             go_up = 0;
         end
@@ -81,7 +84,12 @@ module  ball
             go_up = 0;
         end
 
-        if (logic_in_air == 1 && go_up == 0) begin
+        if (keycode1 == 8'h1A || keycode2 == 8'h1A || keycode3 == 8'h1A || keycode4 == 8'h1A) begin
+            Ball_Y_Motion_next = -10'd7;
+            go_up = 1;
+        end
+
+        if (logic_in_air == 1 && go_up == 0) begin // Ball is in the air, apply gravity
             Ball_Y_Motion_next = curr_speed + gravity;
             curr_speed = Ball_Y_Motion_next;
             if (curr_speed > 10'd3) begin
@@ -95,11 +103,14 @@ module  ball
         if (touch_down == 1) begin
             Ball_Y_Motion_next = touch_down_position_y - BallY;
         end
-
-        if ((BallY + BallS) >= Ball_Y_Max & keycode != 8'h1A)
-        begin
-            Ball_Y_Motion_next = 10'd0;
+        else if (touch_up == 1) begin
+            Ball_Y_Motion_next = Ball_Y_Step;
         end
+
+        // if ((BallY + BallS) >= Ball_Y_Max & keycode != 8'h1A)
+        // begin
+        //     Ball_Y_Motion_next = 10'd0;
+        // end
 
         //if ( (BallY + BallS) >= Ball_Y_Max )  // Ball is at the bottom edge, BOUNCE!
         //begin

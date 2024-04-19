@@ -54,7 +54,8 @@ module mb_usb_hdmi_top(
 
     //Logic Block
     logic logic_in_air;
-    logic touch_down;
+    logic touch_down, touch_up;
+    logic go_up;
     logic [9:0] touch_down_position_y;
     
     assign reset_ah = reset_rtl_0;
@@ -146,14 +147,17 @@ module mb_usb_hdmi_top(
     ball ball_instance(
         .Reset(reset_ah),
         .frame_clk(vsync),                    //Figure out what this should be so that the ball will move
-        .keycode(keycode0_gpio[7:0]),    //Notice: only one keycode connected to ball by default
+        .keycode(keycode0_gpio),    //Notice: only one keycode connected to ball by default
         .BallX(ballxsig),
         .BallY(ballysig),
         .BallS(ballsizesig),
 
         .logic_in_air(logic_in_air),
         .touch_down(touch_down),
-        .touch_down_position_y(touch_down_position_y)
+        .touch_up(touch_up),
+        .touch_down_position_y(touch_down_position_y),
+        .touch_up_position_y(touch_up_position_y),
+        .go_up(go_up)
     );
     
     //Color Mapper Module   
@@ -183,7 +187,10 @@ module mb_usb_hdmi_top(
         .logic_in_air(logic_in_air),
         .info_ground(info_ground),
         .touch_down(touch_down),
-        .touch_down_position_y(touch_down_position_y)
+        .touch_up(touch_up),
+        .touch_down_position_y(touch_down_position_y),
+        .touch_up_position_y(touch_up_position_y),
+        .go_up(go_up)
     );
     
     
