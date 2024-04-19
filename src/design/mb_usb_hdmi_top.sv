@@ -165,7 +165,8 @@ module mb_usb_hdmi_top(
         .Ball_size(ballsizesig),
         .Red(red),
         .Green(green),
-        .Blue(blue)
+        .Blue(blue),
+        .info_ground(info_ground)
     );
 
     world_map world_map_instance(

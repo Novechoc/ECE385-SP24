@@ -14,7 +14,6 @@ module logic_block
 logic [9:0] x_start;
 logic [9:0] y_loc;
 logic [9:0] length;
-logic [28:0] info_ground[16];
 
 always_comb begin
     // determine if the ball is in the air
