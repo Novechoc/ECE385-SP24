@@ -34,7 +34,9 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/design/VGA_controller.sv"]"\
  "[file normalize "$origin_dir/src/design/ball.sv"]"\
  "[file normalize "$origin_dir/src/design/hex_driver.sv"]"\
+ "[file normalize "$origin_dir/src/design/knife.sv"]"\
  "[file normalize "$origin_dir/src/design/logic.sv"]"\
+ "[file normalize "$origin_dir/src/design/ram.sv"]"\
  "[file normalize "$origin_dir/src/design/world_map.sv"]"\
  "[file normalize "$origin_dir/src/design/mb_usb_hdmi_top.sv"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/constrs_1/imports/pin_assignment/mb_usb_hdmi_top.xdc"]"\
@@ -201,7 +203,9 @@ set files [list \
  [file normalize "${origin_dir}/src/design/VGA_controller.sv"] \
  [file normalize "${origin_dir}/src/design/ball.sv"] \
  [file normalize "${origin_dir}/src/design/hex_driver.sv"] \
+ [file normalize "${origin_dir}/src/design/knife.sv"] \
  [file normalize "${origin_dir}/src/design/logic.sv"] \
+ [file normalize "${origin_dir}/src/design/ram.sv"] \
  [file normalize "${origin_dir}/src/design/world_map.sv"] \
  [file normalize "${origin_dir}/src/design/mb_usb_hdmi_top.sv"] \
 ]
@@ -228,7 +232,17 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
+set file "$origin_dir/src/design/knife.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
 set file "$origin_dir/src/design/logic.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/design/ram.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
