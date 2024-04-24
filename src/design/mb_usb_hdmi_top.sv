@@ -43,7 +43,7 @@ module mb_usb_hdmi_top(
     logic [31:0] keycode0_gpio, keycode1_gpio;
     logic clk_25MHz, clk_125MHz, clk, clk_100MHz;
     logic locked;
-    logic [9:0] drawX, drawY, ballxsig, ballysig, ballsizesig;
+    logic [9:0] drawX, drawY, ballxsig, ballysig, ballsizesig, knifexsig, knifeysig, knifesizesig;
 
     logic hsync, vsync, vde;
     logic [3:0] red, green, blue;
@@ -51,13 +51,18 @@ module mb_usb_hdmi_top(
 
     //World Map
     logic [28:0] info_ground[16];
+    logic [28:0] info_fence[16];
 
     //Logic Block
     logic logic_in_air;
-    logic touch_down, touch_up;
-    logic go_up;
-    logic [9:0] touch_down_position_y;
+    logic touch_down, touch_up, touch_left, touch_right;
+    logic go_up, go_left, go_right;
+    logic [9:0] touch_down_position_y, touch_up_position_y, touch_left_position_x, touch_right_position_x;
     
+    //RAM
+    logic [18:0] ram_read_address;
+    logic [3:0] ram_data_out;
+
     assign reset_ah = reset_rtl_0;
     
     
@@ -155,11 +160,33 @@ module mb_usb_hdmi_top(
         .logic_in_air(logic_in_air),
         .touch_down(touch_down),
         .touch_up(touch_up),
+        .touch_left(touch_left),
+        .touch_right(touch_right),
         .touch_down_position_y(touch_down_position_y),
         .touch_up_position_y(touch_up_position_y),
-        .go_up(go_up)
+        .touch_left_position_x(touch_left_position_x),
+        .touch_right_position_x(touch_right_position_x),
+        .go_up(go_up),
+        .go_left(go_left),
+        .go_right(go_right)
     );
     
+    //Knife Module
+    knife knife_instance(
+        .Reset(reset_ah),
+        .frame_clk(vsync),
+        .keycode(keycode0_gpio),
+        .BallX(ballxsig),
+        .BallY(ballysig),
+        .BallS(ballsizesig),
+        .go_left(go_left),
+        .go_right(go_right),
+        .knifeX(knifexsig),
+        .knifeY(knifeysig),
+        .knifeS(knifesizesig),
+        .knife_touch_fence(knife_touch_fence)
+    );
+
     //Color Mapper Module   
     color_mapper color_instance(
         .BallX(ballxsig),
@@ -170,27 +197,51 @@ module mb_usb_hdmi_top(
         .Red(red),
         .Green(green),
         .Blue(blue),
-        .info_ground(info_ground)
+        .info_ground(info_ground),
+        .info_fence(info_fence),
+        .KnifeX(knifexsig),
+        .KnifeY(knifeysig),
+        .Knife_size(knifesizesig),
+        .ram_read_address(ram_read_address),
+        .ram_data_out(ram_data_out)
     );
 
     world_map world_map_instance(
         .Reset(reset_ah),
-        .info_ground(info_ground)
+        .info_ground(info_ground),
+        .info_fence(info_fence)
     );
 
     logic_block logic_block_instance(
-        .pixel_clk(clk_25MHz),
+        .pixel_clk(vsync),
         .reset(reset_ah),
         .BallX(ballxsig),
         .BallY(ballysig),
         .BallS(ballsizesig),
+        .KnifeX(knifexsig),
+        .KnifeY(knifeysig),
+        .KnifeS(knifesizesig),
         .logic_in_air(logic_in_air),
         .info_ground(info_ground),
+        .info_fence(info_fence),
         .touch_down(touch_down),
         .touch_up(touch_up),
+        .touch_left(touch_left),
+        .touch_right(touch_right),
+        .knife_touch_fence(knife_touch_fence),
         .touch_down_position_y(touch_down_position_y),
         .touch_up_position_y(touch_up_position_y),
-        .go_up(go_up)
+        .touch_left_position_x(touch_left_position_x),
+        .touch_right_position_x(touch_right_position_x),
+        .go_up(go_up),
+        .go_left(go_left),
+        .go_right(go_right)
+    );
+
+    frameRAM frameRAM_instance(
+        .read_address(ram_read_address),
+        .Clk(vsync),
+        .data_Out(ram_data_out)
     );
     
     

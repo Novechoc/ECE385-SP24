@@ -1,3 +1,4 @@
+
 //-------------------------------------------------------------------------
 //    Ball.sv                                                            --
 //    Viral Mehta                                                        --
@@ -22,14 +23,14 @@ module  ball
     input  logic [31:0]  keycode,
 
     input  logic logic_in_air,
-    input  logic touch_down, touch_up,
-    input  logic [9:0] touch_down_position_y,
-    input  logic [9:0] touch_up_position_y,
+    input  logic touch_down, touch_up, touch_left, touch_right,
+    input  logic [9:0] touch_down_position_y, touch_left_position_x,
+    input  logic [9:0] touch_up_position_y, touch_right_position_x,
 
     output logic [9:0]  BallX, 
     output logic [9:0]  BallY, 
     output logic [9:0]  BallS,
-    output logic [9:0]  go_up 
+    output logic [9:0]  go_up, go_left, go_right
 );
     
 
@@ -61,6 +62,7 @@ module  ball
         curr_speed = 10'd0;
         gravity = 10'd1;
         go_up = 0;
+        go_left = 0; go_right = 0;
     end
 
     always_comb begin
@@ -68,24 +70,26 @@ module  ball
         Ball_X_Motion_next = 10'd0;
 
         //modify to control ball motion with the keycode
-        if (keycode1 == 8'h16 || keycode2 == 8'h16 || keycode3 == 8'h16 || keycode4 == 8'h16) begin
-            Ball_X_Motion_next = 10'd0;
-            go_up = 0;
-        end        
-        else if (keycode1 == 8'h07 || keycode2 == 8'h07 || keycode3 == 8'h07 || keycode4 == 8'h07) begin
+        if (keycode1 == 8'h07 || keycode2 == 8'h07 || keycode3 == 8'h07 || keycode4 == 8'h07) begin
             Ball_X_Motion_next = 10'd1;
             go_up = 0;
+            go_left = 0;
+            go_right = 1;
         end
         else if (keycode1 == 8'h04 || keycode2 == 8'h04 || keycode3 == 8'h04 || keycode4 == 8'h04) begin
             Ball_X_Motion_next = -10'd1;
             go_up = 0;
+            go_left = 1; 
+            go_right = 0;
         end
         else begin
             go_up = 0;
+            go_left = 0;
+            go_right = 0;
         end
 
         if (keycode1 == 8'h1A || keycode2 == 8'h1A || keycode3 == 8'h1A || keycode4 == 8'h1A) begin
-            Ball_Y_Motion_next = -10'd7;
+            Ball_Y_Motion_next = -10'd5;
             go_up = 1;
         end
 
@@ -99,12 +103,20 @@ module  ball
         else begin
             curr_speed = 10'd0;
         end
+
         
         if (touch_down == 1) begin
             Ball_Y_Motion_next = touch_down_position_y - BallY;
         end
-        else if (touch_up == 1) begin
-            Ball_Y_Motion_next = Ball_Y_Step;
+        else if (touch_up == 1 ) begin
+            Ball_Y_Motion_next = Ball_Y_Step;//
+        end
+
+        if (touch_right == 1) begin
+            Ball_X_Motion_next = touch_right_position_x - BallX;
+        end
+        else if (touch_left == 1) begin
+            Ball_X_Motion_next = touch_left_position_x - BallX;
         end
 
         // if ((BallY + BallS) >= Ball_Y_Max & keycode != 8'h1A)
@@ -116,6 +128,8 @@ module  ball
         //begin
         //    Ball_Y_Motion_next = (~ (Ball_Y_Step) + 1'b1);  // set to -1 via 2's complement.
         //end
+
+        //boundary check
         if ( (BallY - BallS) <= Ball_Y_Min )  // Ball is at the top edge, BOUNCE!
         begin
             Ball_Y_Motion_next = Ball_Y_Step;
@@ -128,7 +142,7 @@ module  ball
         begin
             Ball_X_Motion_next = Ball_X_Step;
         end
-       //fill in the rest of the motion equations here to bounce left and right
+
 
     end
 
