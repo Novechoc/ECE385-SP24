@@ -89,16 +89,18 @@ module  ball
         end
 
         if (keycode1 == 8'h1A || keycode2 == 8'h1A || keycode3 == 8'h1A || keycode4 == 8'h1A) begin
-            Ball_Y_Motion_next = -10'd5;
+            Ball_Y_Motion_next = -10'd6;
             go_up = 1;
         end
 
-        if (logic_in_air == 1 && go_up == 0) begin // Ball is in the air, apply gravity
-            Ball_Y_Motion_next = curr_speed + gravity;
-            curr_speed = Ball_Y_Motion_next;
-            if (curr_speed > 10'd3) begin
-                curr_speed = 10'd3;
-            end
+        if (logic_in_air == 1) begin // Ball is in the air, apply gravity
+                if (keycode1 != 8'h1A && keycode2 != 8'h1A && keycode3 != 8'h1A && keycode4 != 8'h1A) begin
+                    Ball_Y_Motion_next = curr_speed + gravity;
+                    curr_speed = Ball_Y_Motion_next;
+                    if (curr_speed > 10'd3) begin
+                        curr_speed = 10'd3;
+                    end 
+                end
         end
         else begin
             curr_speed = 10'd0;

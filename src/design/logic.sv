@@ -42,7 +42,7 @@ always_comb begin
         length_ground = info_ground[i][28:19];
         if ((BallX - 4*BallS/5<= x_start + length_ground) && (BallX + 4*BallS/5 >= x_start)) begin
             if ((BallY + BallS> y_loc) && (BallY - BallS < y_loc)) begin
-                if ((BallY <= y_loc + 2 * BallS / 5) && go_up == 0) begin
+                if ((BallY <= y_loc + 2 * BallS / 5) && go_up == 0) begin //3
                     touch_down = 1;
                     touch_down_position_y = y_loc - BallS;
                 end

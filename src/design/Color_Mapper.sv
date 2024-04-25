@@ -14,21 +14,33 @@
 //-------------------------------------------------------------------------
 
 
-module  color_mapper ( input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
+module  color_mapper ( input  logic Clk, vde,
+                       input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
                        input  logic [9:0] KnifeX, KnifeY, Knife_size,
                        output logic [3:0]  Red, Green, Blue, 
                        input  logic [28:0] info_fence[16],
-                       input  logic [28:0] info_ground[16],
-
-                       output logic [18:0] ram_read_address,
-                       input  logic [3:0] ram_data_out);
+                       input  logic [28:0] info_ground[16]);
+                       
+                       
+    logic [3:0] Red_background;
+    logic [3:0] Green_background;
+    logic [3:0] Blue_background;
+    
+    background_example background_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .blank(vde),
+        .red(Red_background),
+        .green(Green_background),
+        .blue(Blue_background)
+    );
     
     logic ball_on, knife_on;
     logic ground_on, ground_flag, fence_on, fence_flag;
     logic [9:0] x_start, y_loc, length_ground;
     logic [9:0] y_start, x_loc, length_fence;
 
-    assign ram_read_address = DrawY * 640 + DrawX;
 
     initial begin
         ball_on = 1'b0;
@@ -61,8 +73,8 @@ module  color_mapper ( input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
 //throw knife
     always_comb
     begin:Knife_on_proc
-        if ( ((Dist_knifeX*Dist_knifeX + Dist_knifeY*Dist_knifeY) <= (Size_knife * Size_knife)) &&
-            (DrawY >= KnifeY +  Size_knife/2)&& (DrawY <= KnifeY +  Size_knife/2 + 3 ))
+        if ( ((Dist_knifeX*Dist_knifeX + Dist_knifeY*Dist_knifeY) <= (Size_knife * Size_knife))) //&&
+            //(DrawY >= KnifeY +  Size_knife/2)&& (DrawY <= KnifeY +  Size_knife/2 + 3 ))
             knife_on = 1'b1;
         else 
             knife_on = 1'b0;
@@ -110,8 +122,6 @@ module  color_mapper ( input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
         end    
     end
 
-    logic [11:0] color_platte[16] = '{12'hF00, 12'hEFE, 12'h753, 12'hAEC, 12'h5CD, 12'h5A8, 12'h9C4,12'hC75, 12'h4A9, 12'h7DD, 12'h357, 12'h361, 12'h8EE, 12'h589, 12'h299, 12'h7DE};
-
     always_comb
     begin:RGB_Displa
         if ((ground_on == 1'b1)) begin 
@@ -135,9 +145,9 @@ module  color_mapper ( input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
             Blue = 4'hb;
         end   
         else begin 
-            Red = color_platte[ram_data_out][11:8];
-            Green = color_platte[ram_data_out][7:4];
-            Blue = color_platte[ram_data_out][3:0];
+            Red = Red_background;
+            Green = Green_background;
+            Blue = Blue_background;
         end      
     end 
     

@@ -17,11 +17,11 @@ logic [3:0] mem [0:30719];
 
 initial
 begin
-	 $readmemh("ram_file/1.txt", mem);
+	 $readmemh("ram_file/123.txt", mem);
 end
 
 
-always_ff @ (posedge Clk) begin
+always_comb begin
 	data_Out<= mem[read_address];
 end
 

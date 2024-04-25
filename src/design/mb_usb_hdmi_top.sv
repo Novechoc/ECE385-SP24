@@ -41,7 +41,7 @@ module mb_usb_hdmi_top(
 );
     
     logic [31:0] keycode0_gpio, keycode1_gpio;
-    logic clk_25MHz, clk_125MHz, clk, clk_100MHz;
+    logic clk_25MHz, clk_125MHz, clk_100MHz;
     logic locked;
     logic [9:0] drawX, drawY, ballxsig, ballysig, ballsizesig, knifexsig, knifeysig, knifesizesig;
 
@@ -58,10 +58,7 @@ module mb_usb_hdmi_top(
     logic touch_down, touch_up, touch_left, touch_right;
     logic go_up, go_left, go_right;
     logic [9:0] touch_down_position_y, touch_up_position_y, touch_left_position_x, touch_right_position_x;
-    
-    //RAM
-    logic [18:0] ram_read_address;
-    logic [3:0] ram_data_out;
+    logic knife_touch_fence;  
 
     assign reset_ah = reset_rtl_0;
     
@@ -189,6 +186,8 @@ module mb_usb_hdmi_top(
 
     //Color Mapper Module   
     color_mapper color_instance(
+        .Clk(clk_25MHz),
+        .vde(vde),
         .BallX(ballxsig),
         .BallY(ballysig),
         .DrawX(drawX),
@@ -201,9 +200,7 @@ module mb_usb_hdmi_top(
         .info_fence(info_fence),
         .KnifeX(knifexsig),
         .KnifeY(knifeysig),
-        .Knife_size(knifesizesig),
-        .ram_read_address(ram_read_address),
-        .ram_data_out(ram_data_out)
+        .Knife_size(knifesizesig)
     );
 
     world_map world_map_instance(
@@ -238,11 +235,6 @@ module mb_usb_hdmi_top(
         .go_right(go_right)
     );
 
-    frameRAM frameRAM_instance(
-        .read_address(ram_read_address),
-        .Clk(vsync),
-        .data_Out(ram_data_out)
-    );
-    
+
     
 endmodule
