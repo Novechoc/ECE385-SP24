@@ -73,8 +73,8 @@ module  color_mapper ( input  logic Clk, vde,
 //throw knife
     always_comb
     begin:Knife_on_proc
-        if ( ((Dist_knifeX*Dist_knifeX + Dist_knifeY*Dist_knifeY) <= (Size_knife * Size_knife))) //&&
-            //(DrawY >= KnifeY +  Size_knife/2)&& (DrawY <= KnifeY +  Size_knife/2 + 3 ))
+        if ( ((Dist_knifeX*Dist_knifeX + Dist_knifeY*Dist_knifeY) <= (Size_knife * Size_knife)) &&
+            (DrawY >= KnifeY +  Size_knife/2)&& (DrawY <= KnifeY +  Size_knife/2 + 3 ))
             knife_on = 1'b1;
         else 
             knife_on = 1'b0;

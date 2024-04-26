@@ -51,6 +51,10 @@ module  ball
 
     logic [9:0] curr_speed;
     logic [9:0] gravity;
+    
+    logic wait_jump, drop_ground;
+    logic [3:0] counter_jump;
+    logic [3:0] counter_jump_time;
 
     logic [7:0] keycode1, keycode2, keycode3, keycode4;
     assign keycode1 = keycode[7:0];
@@ -63,6 +67,11 @@ module  ball
         gravity = 10'd1;
         go_up = 0;
         go_left = 0; go_right = 0;
+        wait_jump = 0;
+        drop_ground = 0;
+        counter_jump = 4'b0;
+        counter_jump_time = 4'b0;
+        
     end
 
     always_comb begin
@@ -88,18 +97,24 @@ module  ball
             go_right = 0;
         end
 
-        if (keycode1 == 8'h1A || keycode2 == 8'h1A || keycode3 == 8'h1A || keycode4 == 8'h1A) begin
-            Ball_Y_Motion_next = -10'd6;
+        if ((keycode1 == 8'h1A || keycode2 == 8'h1A || keycode3 == 8'h1A || keycode4 == 8'h1A) && drop_ground == 0) begin
+            Ball_Y_Motion_next = -10'd8;
             go_up = 1;
         end
 
         if (logic_in_air == 1) begin // Ball is in the air, apply gravity
-                if (keycode1 != 8'h1A && keycode2 != 8'h1A && keycode3 != 8'h1A && keycode4 != 8'h1A) begin
+                if (wait_jump == 1) begin
+                    Ball_Y_Motion_next = 0;
+                end
+                else if ((keycode1 != 8'h1A && keycode2 != 8'h1A && keycode3 != 8'h1A && keycode4 != 8'h1A) || drop_ground == 1 ) begin
                     Ball_Y_Motion_next = curr_speed + gravity;
                     curr_speed = Ball_Y_Motion_next;
                     if (curr_speed > 10'd3) begin
                         curr_speed = 10'd3;
                     end 
+                end
+                else begin
+                    curr_speed = 10'd0;
                 end
         end
         else begin
@@ -147,6 +162,44 @@ module  ball
 
 
     end
+        
+    always_ff @(posedge frame_clk) begin
+        if (Reset) begin
+            drop_ground <= 0;
+            wait_jump <= 0;
+            counter_jump <= 0;
+            counter_jump_time <= 0;
+        end
+        else if (counter_jump_time >= 2 && logic_in_air == 1) begin
+            drop_ground <= 1;
+        end
+        else if (go_up && !wait_jump) begin
+            counter_jump <= counter_jump + 1;
+            if (counter_jump >= 6) begin
+                wait_jump <= 1;
+            end
+        end
+        else if (wait_jump) begin
+            counter_jump <= counter_jump + 1;
+            if (counter_jump >= 11 && keycode1 != 8'h1A && keycode2 != 8'h1A && keycode3 != 8'h1A && keycode4 != 8'h1A) begin  // Adjust this value to control jump height/duration
+                drop_ground <= 0;
+                wait_jump <= 0;
+                counter_jump <= 0;
+                counter_jump_time <= counter_jump_time + 1;
+            end
+            else if (counter_jump >= 11) begin
+                wait_jump <= 0;
+                drop_ground <= 1;
+            end
+        end
+        else if (logic_in_air == 0) begin
+            drop_ground <= 0;
+            wait_jump <= 0;
+            counter_jump <= 0;
+            counter_jump_time <= 0;  
+        end
+    end
+
 
     assign BallS = 16;  // default ball size
     assign Ball_X_next = (BallX + Ball_X_Motion_next);
