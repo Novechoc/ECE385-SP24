@@ -201,7 +201,7 @@ module  ball
     end
 
 
-    assign BallS = 16;  // default ball size
+    assign BallS = 15;  // default ball size
     assign Ball_X_next = (BallX + Ball_X_Motion_next);
     assign Ball_Y_next = (BallY + Ball_Y_Motion_next);
    

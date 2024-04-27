@@ -1,7 +1,8 @@
 module world_map(
     input logic Reset,
     output logic [28:0] info_ground[16],
-    output logic [28:0] info_fence[16]
+    output logic [28:0] info_fence[16],
+    output logic [28:0] info_exit[16]
     );
 
     initial begin
@@ -52,6 +53,10 @@ module world_map(
         info_fence[4][8:0] = 382; //y_start
         info_fence[4][18:9] = 219; //x_loc
         info_fence[4][28:19] = 48; //length
+        
+        info_exit[0][8:0] = 2;
+        info_exit[0][18:9] = 2;
+        info_exit[0][28:19] = 35;
 
         
     end

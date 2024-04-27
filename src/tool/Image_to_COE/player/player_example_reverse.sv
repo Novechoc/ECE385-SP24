@@ -1,12 +1,13 @@
-module background_example (
+module player_example_reverse (
 	input logic vga_clk,
+	input logic [9:0] BallX, BallY,
 	input logic [9:0] DrawX, DrawY,
 	input logic blank,
 	output logic [3:0] red, green, blue
 );
 
-logic [18:0] rom_address;
-logic [3:0] rom_q;
+logic [9:0] rom_address;
+logic [2:0] rom_q;
 
 logic [3:0] palette_red, palette_green, palette_blue;
 
@@ -17,7 +18,7 @@ assign negedge_vga_clk = ~vga_clk;
 
 // address into the rom = (x*xDim)/640 + ((y*yDim)/480) * xDim
 // this will stretch out the sprite across the entire screen
-assign rom_address = ((DrawX * 640) / 640) + (((DrawY * 480) / 480) * 640);
+assign rom_address = (BallX + 15 - DrawX) + (DrawY + 15 - BallY) * 30;
 
 always_ff @ (posedge vga_clk) begin
 	red <= 4'h0;
@@ -31,13 +32,13 @@ always_ff @ (posedge vga_clk) begin
 	end
 end
 
-background_rom background_rom (
+player_rom player_rom_inst2 (
 	.clka   (negedge_vga_clk),
 	.addra (rom_address),
 	.douta       (rom_q)
 );
 
-background_palette background_palette (
+player_palette player_palette_inst2 (
 	.index (rom_q),
 	.red   (palette_red),
 	.green (palette_green),

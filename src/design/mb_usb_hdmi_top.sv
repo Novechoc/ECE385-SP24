@@ -52,6 +52,7 @@ module mb_usb_hdmi_top(
     //World Map
     logic [28:0] info_ground[16];
     logic [28:0] info_fence[16];
+    logic [28:0] info_exit[16];
 
     //Logic Block
     logic logic_in_air;
@@ -198,15 +199,19 @@ module mb_usb_hdmi_top(
         .Blue(blue),
         .info_ground(info_ground),
         .info_fence(info_fence),
+        .info_exit(info_exit),
         .KnifeX(knifexsig),
         .KnifeY(knifeysig),
-        .Knife_size(knifesizesig)
+        .Knife_size(knifesizesig),
+        .go_left(go_left),
+        .go_right(go_right)
     );
 
     world_map world_map_instance(
         .Reset(reset_ah),
         .info_ground(info_ground),
-        .info_fence(info_fence)
+        .info_fence(info_fence),
+        .info_exit(info_exit)
     );
 
     logic_block logic_block_instance(
