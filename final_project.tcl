@@ -24,6 +24,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/player_rom/player_rom.xci"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/ground_rom/ground_rom.xci"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/door_rom/door_rom.xci"]"\
+ "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/wall_rom/wall_rom.xci"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/utils_1/imports/synth_1/mb_usb_hdmi_top.dcp"]"\
   ]
   foreach ifile $files {
@@ -49,12 +50,18 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player_example.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player_example_reverse.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player_palette.sv"]"\
+ "[file normalize "$origin_dir/src/design/state_machine.sv"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/wall/wall_example.sv"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/wall/wall_palette.sv"]"\
  "[file normalize "$origin_dir/src/design/world_map.sv"]"\
+ "[file normalize "$origin_dir/src/design/world_map_1.sv"]"\
+ "[file normalize "$origin_dir/src/design/world_selector.sv"]"\
  "[file normalize "$origin_dir/src/design/mb_usb_hdmi_top.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/background/background.COE"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player.COE"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/ground/ground.COE"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/door/door.COE"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/wall/wall.COE"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/constrs_1/imports/pin_assignment/mb_usb_hdmi_top.xdc"]"\
   ]
   foreach ifile $files {
@@ -190,12 +197,13 @@ set_property -name "simulator.xsim_gcc_version" -value "6.2.0" -objects $obj
 set_property -name "simulator.xsim_version" -value "2022.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
-set_property -name "webtalk.activehdl_export_sim" -value "15" -objects $obj
-set_property -name "webtalk.modelsim_export_sim" -value "15" -objects $obj
-set_property -name "webtalk.questa_export_sim" -value "15" -objects $obj
-set_property -name "webtalk.riviera_export_sim" -value "15" -objects $obj
-set_property -name "webtalk.vcs_export_sim" -value "15" -objects $obj
-set_property -name "webtalk.xsim_export_sim" -value "15" -objects $obj
+set_property -name "webtalk.activehdl_export_sim" -value "16" -objects $obj
+set_property -name "webtalk.modelsim_export_sim" -value "16" -objects $obj
+set_property -name "webtalk.questa_export_sim" -value "16" -objects $obj
+set_property -name "webtalk.riviera_export_sim" -value "16" -objects $obj
+set_property -name "webtalk.vcs_export_sim" -value "16" -objects $obj
+set_property -name "webtalk.xcelium_export_sim" -value "1" -objects $obj
+set_property -name "webtalk.xsim_export_sim" -value "16" -objects $obj
 set_property -name "xpm_libraries" -value "XPM_CDC XPM_FIFO XPM_MEMORY" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
@@ -230,12 +238,18 @@ set files [list \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player_example.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player_example_reverse.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player_palette.sv"] \
+ [file normalize "${origin_dir}/src/design/state_machine.sv"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/wall/wall_example.sv"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/wall/wall_palette.sv"] \
  [file normalize "${origin_dir}/src/design/world_map.sv"] \
+ [file normalize "${origin_dir}/src/design/world_map_1.sv"] \
+ [file normalize "${origin_dir}/src/design/world_selector.sv"] \
  [file normalize "${origin_dir}/src/design/mb_usb_hdmi_top.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/background/background.COE"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player.COE"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/ground/ground.COE"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/door/door.COE"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/wall/wall.COE"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -315,7 +329,32 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
+set file "$origin_dir/src/design/state_machine.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/tool/Image_to_COE/wall/wall_example.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/tool/Image_to_COE/wall/wall_palette.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
 set file "$origin_dir/src/design/world_map.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/design/world_map_1.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/design/world_selector.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -452,6 +491,27 @@ set added_files [add_files -fileset sources_1 $files]
 
 # Set 'sources_1' fileset file properties for local files
 set file "door_rom/door_rom.xci"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+
+# Set 'sources_1' fileset object
+set obj [get_filesets sources_1]
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/ip/wall_rom/wall_rom.xci" ]\
+]
+set added_files [add_files -fileset sources_1 $files]
+
+# Set 'sources_1' fileset file properties for remote files
+# None
+
+# Set 'sources_1' fileset file properties for local files
+set file "wall_rom/wall_rom.xci"
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
 set_property -name "registered_with_manager" -value "1" -objects $file_obj
