@@ -14,6 +14,7 @@ module knife(
 
     logic throw_knife;
     logic knife_exist;
+    logic direction;
     logic [9:0] knife_motion_X;
     logic [9:0] knife_speed;
     logic [7:0] keycode1, keycode2, keycode3, keycode4;
@@ -33,8 +34,20 @@ module knife(
             knife_exist <= 0;
             throw_knife <= 0;
             knife_motion_X <= knife_speed;
+            direction <= 1'b0;
         end
         else begin
+        
+        if (go_left == 1) begin
+            direction <= 1'b1;
+        end
+        else if (go_right == 1) begin
+            direction <= 1'b0;
+        end
+        else begin
+            direction <= direction;
+        end
+
         if ((throw_knife==1)&&(keycode1 != 8'h0D || keycode2 != 8'h0D || keycode3 != 8'h0D || keycode4 != 8'h0D)) begin
             throw_knife <= 0;
         end
@@ -43,7 +56,7 @@ module knife(
             if(knife_exist == 0) begin
                 knifeX <= BallX;
                 knifeY <= BallY;
-                if(go_left == 1) begin
+                if(direction == 1) begin
                     knife_motion_X <= -knife_speed;
                 end
                 else begin

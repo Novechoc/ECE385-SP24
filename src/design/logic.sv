@@ -7,8 +7,10 @@ module logic_block
     input logic [9:0]  BallS, KnifeS,
     input logic [28:0] info_ground[16],
     input logic [28:0] info_fence[16],
+    input logic [9:0]  info_exit[2],
+    input logic [20:0] info_spince[6],
     input logic go_up, go_left, go_right,
-    output logic logic_in_air,
+    output logic logic_in_air, win_the_game, lose_the_game,
     output logic touch_down, touch_up, touch_left, touch_right, knife_touch_fence,
     output logic [9:0] touch_down_position_y, touch_left_position_x, 
     output logic [9:0] touch_up_position_y, touch_right_position_x
@@ -17,7 +19,7 @@ module logic_block
 logic [9:0] x_start, y_start;
 logic [9:0] y_loc, x_loc;
 logic [9:0] length_ground, length_fence;
-
+logic [9:0] spinceX, spinceY;
 always_comb begin
     // determine if the ball is in the air
     logic_in_air = 1;
@@ -63,7 +65,7 @@ always_comb begin
         length_fence = info_fence[j][28:19];
         if ((BallY - 4*BallS/5 <= y_start + length_fence) && (BallY + 4*BallS/5 >= y_start)) begin
             if ((BallX + BallS > x_loc) && (BallX - BallS < x_loc)) begin
-                if ((BallX <= x_loc + 4 * BallS / 5) && go_left == 0) begin
+                if ((BallX <= x_loc + 6 * BallS / 7) && go_left == 0) begin
                     touch_right = 1;
                     touch_right_position_x = x_loc - BallS;
                 end
@@ -86,7 +88,25 @@ always_comb begin
             end
         end
     end
-    
+// determine if the ball is touching the exit
+    win_the_game = 0;
+    if((BallX  >= info_exit[0]-10) && (BallX <= info_exit[0]+10) 
+    && (BallY>= info_exit[1]-20) && (BallY <= info_exit[1]+20)) begin
+        win_the_game = 1;
+    end
+// determine if the ball lose the game
+    lose_the_game = 0;
+    if(BallY > 479) begin
+        lose_the_game = 1;
+    end 
+    for(int i=0; i<6; i=i+1) begin
+        spinceX = info_spince[i][9:0];
+        spinceY = info_spince[i][18:10];
+        if ((BallX-BallS<=4+spinceX)&&(BallX+BallS>=spinceX-4)
+        &&  (BallY-BallS<spinceY+10)&&(BallY+BallS>spinceY-10)) begin
+            lose_the_game = 1;
+        end
+    end
 end
 
 endmodule

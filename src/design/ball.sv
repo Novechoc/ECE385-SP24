@@ -35,8 +35,8 @@ module  ball
     
 
 	 
-    parameter [9:0] Ball_X_Center=320;  // Center position on the X axis
-    parameter [9:0] Ball_Y_Center=240;  // Center position on the Y axis
+    parameter [9:0] Ball_X_Center=20;  // Center position on the X axis
+    parameter [9:0] Ball_Y_Center=100;  // Center position on the Y axis
     parameter [9:0] Ball_X_Min=0;       // Leftmost point on the X axis
     parameter [9:0] Ball_X_Max=639;     // Rightmost point on the X axis
     parameter [9:0] Ball_Y_Min=7;       // Topmost point on the Y axis

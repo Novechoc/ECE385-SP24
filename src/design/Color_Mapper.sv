@@ -21,7 +21,8 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
                        
                        input  logic [28:0] info_fence[16],
                        input  logic [28:0] info_ground[16],
-                       input  logic [28:0] info_exit[16]);
+                       input  logic [9:0] info_exit[2],
+                       input  logic [20:0] info_spince[6]);
                        
                        
     logic [3:0] Red_background;
@@ -34,7 +35,17 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
 
     logic [3:0] Red_player_reverse;
     logic [3:0] Green_player_reverse;
-    logic [3:0] Blue_player_reverse;   
+    logic [3:0] Blue_player_reverse;
+
+    logic [3:0] Red_ground;
+    logic [3:0] Green_ground;
+    logic [3:0] Blue_ground;
+    
+    
+    logic [9:0] DoorX = 20, DoorY = 20;
+    logic [3:0] Red_door;
+    logic [3:0] Green_door;
+    logic [3:0] Blue_door;      
     
     background_example background_example_inst(
         .vga_clk(Clk),
@@ -70,11 +81,36 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .blue(Blue_player_reverse)
     );
     
+    ground_example ground_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .blank(vde),
+        .red(Red_ground),
+        .green(Green_ground),
+        .blue(Blue_ground)
+    );
+    
+    door_example door_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .DoorX(DoorX),
+        .DoorY(DoorY),
+        .blank(vde),
+        .red(Red_door),
+        .green(Green_door),
+        .blue(Blue_door)
+    );
+    
     logic ball_on, knife_on, direction;
-    logic ground_on, ground_flag, fence_on, fence_flag,exit_on, exit_flag;
+    logic ground_on, ground_flag, fence_on, fence_flag, exit_on, spince_on, spince_flag;
     logic [9:0] x_start, y_loc, length_ground;
     logic [9:0] y_start, x_loc, length_fence;
-    logic [9:0] y_start_exit, x_loc_exit, length_exit;
+    logic [9:0] x_spince;
+    logic [8:0] y_spince;
+    logic [2:0] direction_spince;
+    //logic [9:0] y_start_exit, x_loc_exit, length_exit;
 
 
     initial begin
@@ -84,9 +120,11 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         fence_on = 1'b0;
         fence_flag = 1'b0;
         exit_on = 1'b0;
-        exit_flag = 1'b0;
         knife_on = 1'b0;
         direction = 1'b0;
+        spince_on = 1'b0;
+        spince_flag = 1'b0;
+
     end
 	  
     int DistX, DistY, Size;
@@ -100,14 +138,17 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     assign Size_knife = Knife_size;
     
 //direction
-always_ff @(posedge Clk) begin
-    if (go_left == 1) begin
-        direction <= 1'b1;
+    always_ff @(posedge Clk) begin
+        if (go_left == 1) begin
+            direction <= 1'b1;
+        end
+        else if (go_right == 1) begin
+            direction <= 1'b0;
+        end
+        else begin
+            direction <= direction;
+        end
     end
-    else if (go_right == 1) begin
-        direction <= 1'b0;
-    end
-end
 
 //ball
     always_comb
@@ -127,6 +168,17 @@ end
         else 
             knife_on = 1'b0;
     end
+
+//exit
+    always_comb
+    begin
+        if ((DrawX >= 2) && (DrawX <= 41) && (DrawY >= 1) && (DrawY <= 40) ) begin
+            exit_on = 1'b1;
+        end
+        else begin
+            exit_on = 1'b0;
+        end
+    end 
 
 //ground
     always_comb 
@@ -170,38 +222,52 @@ end
         end    
     end
     
-//exit
-    always_comb 
+//spince
+    always_comb
     begin
-        exit_flag = 1'b0;
-        if (exit_flag == 1'b0) begin
-            for (int i = 0; i < 16; i = i + 1) begin
-                y_start_exit = info_exit[i][8:0];
-                x_loc_exit = info_exit[i][18:9];
-                length_exit = info_exit[i][28:19];
-                if ((DrawX >= x_loc_exit - 2) && (DrawX <= x_loc_exit + 1) && (DrawY >= y_start_exit) && (DrawY <= y_start_exit + length_exit)) begin
-                    exit_on = 1'b1;
-                    exit_flag = 1'b1;
-                    break;
-                end
-                else begin
-                    exit_on = 1'b0;
+        spince_flag = 1'b0;
+        if (spince_flag == 1'b0) begin
+            for (int i = 0; i < 6; i = i + 1) begin
+                x_spince = info_spince[i][9:0];
+                y_spince = info_spince[i][18:10];
+                direction_spince = info_spince[i][20:19];
+                if (direction_spince == 1) begin
+                    //width:8 height:20
+                    if ((DrawX>= x_spince-4) && (DrawX <= x_spince + 4) &&
+                     (DrawY >= y_spince - 10) && (DrawY <= y_spince + 10)&&
+                     (DrawY-y_spince>=4*(DrawX-x_spince-2))&&
+                     (DrawY-y_spince>=-4*(DrawX-x_spince+2))
+                     ) begin
+                        spince_on = 1'b1;
+                        spince_flag = 1'b1;
+                        break;
+                    end
+                    else begin
+                        spince_on = 1'b0;
+                    end
                 end
             end
-        end    
+        end
     end
+
 
     always_comb
     begin:RGB_Displa
+
         if ((ground_on == 1'b1)) begin 
-            Red = 4'hC;
-            Green = 4'h7;
-            Blue = 4'h0;
+            Red = Red_ground; //4'hC;
+            Green = Green_ground; //4'h7;
+            Blue = Blue_ground; //4'h0;
         end 
         else if ((fence_on == 1'b1)) begin 
             Red = 4'hC;
             Green = 4'h7;
             Blue = 4'h0;
+        end
+        else if ((spince_on == 1'b1)) begin 
+            Red = 4'hB;
+            Green = 4'h0;
+            Blue = 4'hB;
         end
         else if ((ball_on == 1'b1 && direction == 0) 
         && (!(Red_player == 4'h0 && Green_player == 4'hF && Blue_player == 4'h1) 
@@ -219,15 +285,17 @@ end
             Green = Green_player_reverse;
             Blue = Blue_player_reverse;
         end
-        else if ((exit_on == 1'b1)) begin 
-            Red = 4'hC;
-            Green = 4'h7;
-            Blue = 4'hC;
+        else if ((exit_on == 1'b1)
+        && (!(Red_door == 4'h0 && Green_door == 4'hF && Blue_door == 4'h1) 
+        && !(Red_door == 4'h2 && Green_door == 4'h9 && Blue_door == 4'h3))) begin 
+            Red = Red_door;
+            Green = Green_door;
+            Blue = Blue_door;
         end
         else if ((knife_on == 1'b1)) begin 
-            Red = 4'hb;
-            Green = 4'hb;
-            Blue = 4'hb;
+            Red = 4'hd;
+            Green = 4'hd;
+            Blue = 4'hd;
         end   
         else begin 
             Red = Red_background;

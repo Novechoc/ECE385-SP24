@@ -52,7 +52,8 @@ module mb_usb_hdmi_top(
     //World Map
     logic [28:0] info_ground[16];
     logic [28:0] info_fence[16];
-    logic [28:0] info_exit[16];
+    logic [9:0] info_exit[2];
+    logic [20:0] info_spince[6];
 
     //Logic Block
     logic logic_in_air;
@@ -60,7 +61,8 @@ module mb_usb_hdmi_top(
     logic go_up, go_left, go_right;
     logic [9:0] touch_down_position_y, touch_up_position_y, touch_left_position_x, touch_right_position_x;
     logic knife_touch_fence;  
-
+    //win or lose
+    logic win_the_game, lose_the_game;
     assign reset_ah = reset_rtl_0;
     
     
@@ -200,6 +202,7 @@ module mb_usb_hdmi_top(
         .info_ground(info_ground),
         .info_fence(info_fence),
         .info_exit(info_exit),
+        .info_spince(info_spince),
         .KnifeX(knifexsig),
         .KnifeY(knifeysig),
         .Knife_size(knifesizesig),
@@ -209,9 +212,11 @@ module mb_usb_hdmi_top(
 
     world_map world_map_instance(
         .Reset(reset_ah),
+        .Clk(vsync),
         .info_ground(info_ground),
         .info_fence(info_fence),
-        .info_exit(info_exit)
+        .info_exit(info_exit),
+        .info_spince(info_spince)
     );
 
     logic_block logic_block_instance(
@@ -226,6 +231,7 @@ module mb_usb_hdmi_top(
         .logic_in_air(logic_in_air),
         .info_ground(info_ground),
         .info_fence(info_fence),
+        .info_exit(info_exit),
         .touch_down(touch_down),
         .touch_up(touch_up),
         .touch_left(touch_left),
@@ -237,7 +243,9 @@ module mb_usb_hdmi_top(
         .touch_right_position_x(touch_right_position_x),
         .go_up(go_up),
         .go_left(go_left),
-        .go_right(go_right)
+        .go_right(go_right),
+        .win_the_game(win_the_game),
+        .lose_the_game(lose_the_game)
     );
 
 
