@@ -21,6 +21,7 @@ module  ball
     input  logic        Reset, 
     input  logic        frame_clk,
     input  logic [31:0]  keycode,
+    input  logic [3:0] game_state,
 
     input  logic logic_in_air,
     input  logic touch_down, touch_up, touch_left, touch_right,
@@ -36,7 +37,7 @@ module  ball
 
 	 
     parameter [9:0] Ball_X_Center=20;  // Center position on the X axis
-    parameter [9:0] Ball_Y_Center=100;  // Center position on the Y axis
+    parameter [9:0] Ball_Y_Center=300;  // Center position on the Y axis
     parameter [9:0] Ball_X_Min=0;       // Leftmost point on the X axis
     parameter [9:0] Ball_X_Max=639;     // Rightmost point on the X axis
     parameter [9:0] Ball_Y_Min=7;       // Topmost point on the Y axis
@@ -71,7 +72,6 @@ module  ball
         drop_ground = 0;
         counter_jump = 4'b0;
         counter_jump_time = 4'b0;
-        
     end
 
     always_comb begin
@@ -207,7 +207,7 @@ module  ball
    
     always_ff @(posedge frame_clk) //make sure the frame clock is instantiated correctly
     begin: Move_Ball
-        if (Reset)
+        if (Reset || game_state == 4'd1)
         begin 
 			BallY <= Ball_Y_Center;
 			BallX <= Ball_X_Center;

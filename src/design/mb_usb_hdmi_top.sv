@@ -50,10 +50,10 @@ module mb_usb_hdmi_top(
     logic reset_ah;
 
     //World Map
-    logic [28:0] info_ground[16];
-    logic [28:0] info_fence[16];
-    logic [9:0] info_exit[2];
-    logic [20:0] info_spince[6];
+    logic [28:0] info_ground[16], info_ground_0[16], info_ground_1[16];
+    logic [28:0] info_fence[16], info_fence_0[16], info_fence_1[16];
+    logic [9:0] info_exit[2], info_exit_0[2], info_exit_1[2];
+    logic [20:0] info_spince[6], info_spince_0[6], info_spince_1[6];
 
     //Logic Block
     logic logic_in_air;
@@ -63,6 +63,11 @@ module mb_usb_hdmi_top(
     logic knife_touch_fence;  
     //win or lose
     logic win_the_game, lose_the_game;
+
+    //state machine
+    logic [3:0] game_state;
+    logic [1:0] selector_value;
+
     assign reset_ah = reset_rtl_0;
     
     
@@ -156,7 +161,7 @@ module mb_usb_hdmi_top(
         .BallX(ballxsig),
         .BallY(ballysig),
         .BallS(ballsizesig),
-
+        .game_state(game_state),
         .logic_in_air(logic_in_air),
         .touch_down(touch_down),
         .touch_up(touch_up),
@@ -207,16 +212,26 @@ module mb_usb_hdmi_top(
         .KnifeY(knifeysig),
         .Knife_size(knifesizesig),
         .go_left(go_left),
-        .go_right(go_right)
+        .go_right(go_right),
+        .game_state(game_state)
     );
 
     world_map world_map_instance(
         .Reset(reset_ah),
         .Clk(vsync),
-        .info_ground(info_ground),
-        .info_fence(info_fence),
-        .info_exit(info_exit),
-        .info_spince(info_spince)
+        .info_ground(info_ground_1),
+        .info_fence(info_fence_1),
+        .info_exit(info_exit_1),
+        .info_spince(info_spince_1)
+    );
+
+    world_map_0 world_map_0_instance(
+        .Reset(reset_ah),
+        .Clk(vsync),
+        .info_ground(info_ground_0),
+        .info_fence(info_fence_0),
+        .info_exit(info_exit_0),
+        .info_spince(info_spince_0)
     );
 
     logic_block logic_block_instance(
@@ -232,6 +247,7 @@ module mb_usb_hdmi_top(
         .info_ground(info_ground),
         .info_fence(info_fence),
         .info_exit(info_exit),
+        .info_spince(info_spince),
         .touch_down(touch_down),
         .touch_up(touch_up),
         .touch_left(touch_left),
@@ -246,6 +262,37 @@ module mb_usb_hdmi_top(
         .go_right(go_right),
         .win_the_game(win_the_game),
         .lose_the_game(lose_the_game)
+    );
+
+    state_machine state_machine_instance(
+        .reset(reset_ah),
+        .pixel_clk(vsync),
+        .game_state(game_state),
+        .keycode(keycode0_gpio),
+        .win_the_game(win_the_game),
+        .lose_the_game(lose_the_game),
+        .selector_value(selector_value)
+    );
+
+    world_selector world_selector_instance(
+        .Reset(reset_ah),
+        .Clk(vsync),
+        .selector_value(selector_value),
+        
+        .info_ground_0(info_ground_0),
+        .info_fence_0(info_fence_0),
+        .info_exit_0(info_exit_0),
+        .info_spince_0(info_spince_0),
+        
+        .info_ground_1(info_ground_1),
+        .info_fence_1(info_fence_1),
+        .info_exit_1(info_exit_1),
+        .info_spince_1(info_spince_1),
+        
+        .info_ground(info_ground),
+        .info_fence(info_fence),
+        .info_exit(info_exit),
+        .info_spince(info_spince)
     );
 
 

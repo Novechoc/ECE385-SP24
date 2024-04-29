@@ -99,11 +99,11 @@ always_comb begin
     if(BallY > 479) begin
         lose_the_game = 1;
     end 
-    for(int i=0; i<6; i=i+1) begin
+    for(int i = 0; i<6; i=i+1) begin
         spinceX = info_spince[i][9:0];
         spinceY = info_spince[i][18:10];
-        if ((BallX-BallS<=4+spinceX)&&(BallX+BallS>=spinceX-4)
-        &&  (BallY-BallS<spinceY+10)&&(BallY+BallS>spinceY-10)) begin
+        if ((BallX-BallS <= 2+spinceX)&&(BallX+BallS >=spinceX-2)
+        &&  (BallY-BallS <= spinceY+1)&&(BallY+BallS>=spinceY-1)) begin
             lose_the_game = 1;
         end
     end

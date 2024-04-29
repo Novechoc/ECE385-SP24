@@ -32,10 +32,10 @@ always_ff @ (posedge vga_clk) begin
 	end
 end
 
-player_rom player_rom_inst2 (
-	.clka   (negedge_vga_clk),
-	.addra (rom_address),
-	.douta       (rom_q)
+player_rom player__reverse_rom_inst (
+	.clkb   (negedge_vga_clk),
+	.addrb (rom_address),
+	.doutb       (rom_q)
 );
 
 player_palette player_palette_inst2 (

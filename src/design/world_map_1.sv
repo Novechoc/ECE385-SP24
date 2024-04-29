@@ -1,4 +1,4 @@
-module world_map(
+module world_map_0(
     input logic Reset, Clk,
     output logic [28:0] info_ground[16],
     output logic [28:0] info_fence[16],
@@ -71,17 +71,17 @@ module world_map(
         info_exit[0] = 10'd20; // x location
         info_exit[1] = 10'd20; // y location
 
-        info_spince[0][9:0] = 60; //the x-axis of the center of the spince
-        info_spince[0][18:10] = 420; //the y-axis of the center of the spince
+//        info_spince[0][9:0] = 60; //the x-axis of the center of the spince
+//        info_spince[0][18:10] = 420; //the y-axis of the center of the spince
+//        info_spince[0][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
+
+//        info_spince[1][9:0] = 260; //the x-axis of the center of the spince
+//        info_spince[1][18:10] = 420; //the y-axis of the center of the spince
+//        info_spince[1][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
+
+        info_spince[0][9:0] = 160; //the x-axis of the center of the spince
+        info_spince[0][18:10] = 370; //the y-axis of the center of the spince
         info_spince[0][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
-
-        info_spince[1][9:0] = 260; //the x-axis of the center of the spince
-        info_spince[1][18:10] = 420; //the y-axis of the center of the spince
-        info_spince[1][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
-
-        info_spince[2][9:0] = 160; //the x-axis of the center of the spince
-        info_spince[2][18:10] = 370; //the y-axis of the center of the spince
-        info_spince[2][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
 
 
     end

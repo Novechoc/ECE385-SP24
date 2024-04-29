@@ -18,6 +18,8 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
                        input  logic [9:0] BallX, BallY, DrawX, DrawY, Ball_size,
                        input  logic [9:0] KnifeX, KnifeY, Knife_size,
                        output logic [3:0]  Red, Green, Blue,
+
+                       input  logic [3:0] game_state,
                        
                        input  logic [28:0] info_fence[16],
                        input  logic [28:0] info_ground[16],
@@ -28,6 +30,10 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     logic [3:0] Red_background;
     logic [3:0] Green_background;
     logic [3:0] Blue_background;
+    
+    logic [3:0] Red_start_screen;
+    logic [3:0] Green_start_screen;
+    logic [3:0] Blue_start_screen;
     
     logic [3:0] Red_player;
     logic [3:0] Green_player;
@@ -41,7 +47,10 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     logic [3:0] Green_ground;
     logic [3:0] Blue_ground;
     
-    
+    logic [3:0] Red_wall;
+    logic [3:0] Green_wall;
+    logic [3:0] Blue_wall;
+       
     logic [9:0] DoorX = 20, DoorY = 20;
     logic [3:0] Red_door;
     logic [3:0] Green_door;
@@ -55,6 +64,16 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .red(Red_background),
         .green(Green_background),
         .blue(Blue_background)
+    );
+    
+    start_screen_example start_screen_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .blank(vde),
+        .red(Red_start_screen),
+        .green(Green_start_screen),
+        .blue(Blue_start_screen)
     );
     
     player_example player_example_inst(
@@ -89,6 +108,16 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .red(Red_ground),
         .green(Green_ground),
         .blue(Blue_ground)
+    );
+    
+    wall_example wall_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .blank(vde),
+        .red(Red_wall),
+        .green(Green_wall),
+        .blue(Blue_wall)
     );
     
     door_example door_example_inst(
@@ -253,55 +282,79 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
 
     always_comb
     begin:RGB_Displa
-
-        if ((ground_on == 1'b1)) begin 
-            Red = Red_ground; //4'hC;
-            Green = Green_ground; //4'h7;
-            Blue = Blue_ground; //4'h0;
-        end 
-        else if ((fence_on == 1'b1)) begin 
-            Red = 4'hC;
-            Green = 4'h7;
-            Blue = 4'h0;
+        if (game_state == 3'd0) begin
+            if (!(Red_start_screen == 4'h0 && Green_start_screen == 4'hF && Blue_start_screen == 4'h1) 
+            && !(Red_start_screen == 4'h5 && Green_start_screen == 4'h7 && Blue_start_screen == 4'h6))begin
+                Red = Red_start_screen;
+                Green = Green_start_screen;
+                Blue = Blue_start_screen;
+            end
+            else begin
+                Red = 4'h0;
+                Green = 4'h0;
+                Blue = 4'h0;
+            end
         end
-        else if ((spince_on == 1'b1)) begin 
-            Red = 4'hB;
-            Green = 4'h0;
-            Blue = 4'hB;
-        end
-        else if ((ball_on == 1'b1 && direction == 0) 
-        && (!(Red_player == 4'h0 && Green_player == 4'hF && Blue_player == 4'h1) 
-        && !(Red_player == 4'h3 && Green_player == 4'hB && Blue_player == 4'h3)
-        && !(Red_player == 4'h7 && Green_player == 4'hB && Blue_player == 4'h6))) begin 
-            Red = Red_player;
-            Green = Green_player;
-            Blue = Blue_player;
-        end
-        else if ((ball_on == 1'b1 && direction == 1) 
-        && (!(Red_player_reverse == 4'h0 && Green_player_reverse == 4'hF && Blue_player_reverse == 4'h1) 
-        && !(Red_player_reverse == 4'h3 && Green_player_reverse == 4'hB && Blue_player_reverse == 4'h3)
-        && !(Red_player_reverse == 4'h7 && Green_player_reverse == 4'hB && Blue_player_reverse == 4'h6))) begin 
-            Red = Red_player_reverse;
-            Green = Green_player_reverse;
-            Blue = Blue_player_reverse;
-        end
-        else if ((exit_on == 1'b1)
-        && (!(Red_door == 4'h0 && Green_door == 4'hF && Blue_door == 4'h1) 
-        && !(Red_door == 4'h2 && Green_door == 4'h9 && Blue_door == 4'h3))) begin 
-            Red = Red_door;
-            Green = Green_door;
-            Blue = Blue_door;
-        end
-        else if ((knife_on == 1'b1)) begin 
-            Red = 4'hd;
-            Green = 4'hd;
-            Blue = 4'hd;
-        end   
-        else begin 
+        else if (game_state == 3'd1) begin
             Red = Red_background;
             Green = Green_background;
             Blue = Blue_background;
-        end      
-    end 
+        end
+        else if (game_state == 3'd2) begin
+            if ((ground_on == 1'b1)) begin 
+                Red = Red_ground; //4'hC;
+                Green = Green_ground; //4'h7;
+                Blue = Blue_ground; //4'h0;
+            end 
+            else if ((fence_on == 1'b1)) begin 
+                Red = Red_wall;
+                Green = Green_wall;
+                Blue = Blue_wall;
+            end
+            else if ((spince_on == 1'b1)) begin 
+                Red = 4'hB;
+                Green = 4'h0;
+                Blue = 4'hB;
+            end
+            else if ((ball_on == 1'b1 && direction == 0) 
+            && (!(Red_player == 4'h0 && Green_player == 4'hF && Blue_player == 4'h1) 
+            && !(Red_player == 4'h3 && Green_player == 4'hB && Blue_player == 4'h3)
+            && !(Red_player == 4'h7 && Green_player == 4'hB && Blue_player == 4'h6))) begin 
+                Red = Red_player;
+                Green = Green_player;
+                Blue = Blue_player;
+            end
+            else if ((ball_on == 1'b1 && direction == 1) 
+            && (!(Red_player_reverse == 4'h0 && Green_player_reverse == 4'hF && Blue_player_reverse == 4'h1) 
+            && !(Red_player_reverse == 4'h3 && Green_player_reverse == 4'hB && Blue_player_reverse == 4'h3)
+            && !(Red_player_reverse == 4'h7 && Green_player_reverse == 4'hB && Blue_player_reverse == 4'h6))) begin 
+                Red = Red_player_reverse;
+                Green = Green_player_reverse;
+                Blue = Blue_player_reverse;
+            end
+            else if ((exit_on == 1'b1)
+            && (!(Red_door == 4'h0 && Green_door == 4'hF && Blue_door == 4'h1) 
+            && !(Red_door == 4'h2 && Green_door == 4'h9 && Blue_door == 4'h3))) begin 
+                Red = Red_door;
+                Green = Green_door;
+                Blue = Blue_door;
+            end
+            else if ((knife_on == 1'b1)) begin 
+                Red = 4'hd;
+                Green = 4'hd;
+                Blue = 4'hd;
+            end   
+            else begin 
+                Red = Red_background;
+                Green = Green_background;
+                Blue = Blue_background;
+            end      
+        end
+        else if (game_state == 4'd3) begin
+            Red = Red_background;
+            Green = Green_background;
+            Blue = Blue_background;
+        end
+    end
     
 endmodule
