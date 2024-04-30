@@ -68,8 +68,8 @@ module world_map(
         info_fence[4][18:9] = 219; //x_loc
         info_fence[4][28:19] = 48; //length
 
-        info_exit[0] = 10'd20; // x location
-        info_exit[1] = 10'd20; // y location
+        info_exit[0] = 20; // x location
+        info_exit[1] = 20; // y location
 
         info_spince[0][9:0] = 60; //the x-axis of the center of the spince
         info_spince[0][18:10] = 420; //the y-axis of the center of the spince

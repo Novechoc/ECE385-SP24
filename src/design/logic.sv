@@ -65,7 +65,7 @@ always_comb begin
         length_fence = info_fence[j][28:19];
         if ((BallY - 4*BallS/5 <= y_start + length_fence) && (BallY + 4*BallS/5 >= y_start)) begin
             if ((BallX + BallS > x_loc) && (BallX - BallS < x_loc)) begin
-                if ((BallX <= x_loc + 6 * BallS / 7) && go_left == 0) begin
+                if ((BallX <= x_loc + 4 * BallS / 5) && go_left == 0) begin
                     touch_right = 1;
                     touch_right_position_x = x_loc - BallS;
                 end

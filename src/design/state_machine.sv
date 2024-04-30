@@ -124,7 +124,7 @@ always_comb begin
             else begin
                 next_state = GAME_WIN_STATE_TRANSITION;
             end
-            game_state = 4'd1;
+            game_state = 4'd0;
             selector_value = 2'b00;  
         end
     endcase

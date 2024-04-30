@@ -34,6 +34,10 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     logic [3:0] Red_start_screen;
     logic [3:0] Green_start_screen;
     logic [3:0] Blue_start_screen;
+
+    logic [3:0] Red_win_screen;
+    logic [3:0] Green_win_screen;
+    logic [3:0] Blue_win_screen;
     
     logic [3:0] Red_player;
     logic [3:0] Green_player;
@@ -51,10 +55,15 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     logic [3:0] Green_wall;
     logic [3:0] Blue_wall;
        
-    logic [9:0] DoorX = 20, DoorY = 20;
+    logic [9:0] DoorX = info_exit[0], DoorY = info_exit[1];
     logic [3:0] Red_door;
     logic [3:0] Green_door;
-    logic [3:0] Blue_door;      
+    logic [3:0] Blue_door;
+    
+    logic [9:0] spinceX, spinceY;
+    logic [3:0] Red_spince;
+    logic [3:0] Green_spince;
+    logic [3:0] Blue_spince;     
     
     background_example background_example_inst(
         .vga_clk(Clk),
@@ -74,6 +83,16 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .red(Red_start_screen),
         .green(Green_start_screen),
         .blue(Blue_start_screen)
+    );
+    
+    win_screen_example win_screen_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .blank(vde),
+        .red(Red_win_screen),
+        .green(Green_win_screen),
+        .blue(Blue_win_screen)
     );
     
     player_example player_example_inst(
@@ -130,6 +149,16 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .red(Red_door),
         .green(Green_door),
         .blue(Blue_door)
+    );
+    
+    spince_example spince_example_inst(
+        .vga_clk(Clk),
+        .DrawX(spinceX),
+        .DrawY(spinceY),
+        .blank(vde),
+        .red(Red_spince),
+        .green(Green_spince),
+        .blue(Blue_spince)
     );
     
     logic ball_on, knife_on, direction;
@@ -201,7 +230,7 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
 //exit
     always_comb
     begin
-        if ((DrawX >= 2) && (DrawX <= 41) && (DrawY >= 1) && (DrawY <= 40) ) begin
+        if ((DrawX >= info_exit[0] - 19) && (DrawX <= info_exit[0] + 20) && (DrawY >= info_exit[1] - 19) && (DrawY <= info_exit[1] + 20 ) ) begin
             exit_on = 1'b1;
         end
         else begin
@@ -252,32 +281,48 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     end
     
 //spince
-    always_comb
-    begin
-        spince_flag = 1'b0;
-        if (spince_flag == 1'b0) begin
-            for (int i = 0; i < 6; i = i + 1) begin
-                x_spince = info_spince[i][9:0];
-                y_spince = info_spince[i][18:10];
-                direction_spince = info_spince[i][20:19];
-                if (direction_spince == 1) begin
-                    //width:8 height:20
-                    if ((DrawX>= x_spince-4) && (DrawX <= x_spince + 4) &&
-                     (DrawY >= y_spince - 10) && (DrawY <= y_spince + 10)&&
-                     (DrawY-y_spince>=4*(DrawX-x_spince-2))&&
-                     (DrawY-y_spince>=-4*(DrawX-x_spince+2))
-                     ) begin
-                        spince_on = 1'b1;
-                        spince_flag = 1'b1;
-                        break;
-                    end
-                    else begin
-                        spince_on = 1'b0;
-                    end
-                end
-            end
+
+always_comb begin
+    for (int i = 0; i < 6; i = i + 1) begin
+        if ((DrawX >= info_spince[i][9:0] - 3) && (DrawX <= info_spince[i][9:0] + 4) 
+        && (DrawY >= info_spince[i][18:10] - 7) && (DrawY <= info_spince[i][18:10] + 7)) begin
+            spince_on = 1'b1;
+            spinceX = DrawX + 5 - info_spince[i][9:0];
+            spinceY = DrawY + 7 - info_spince[i][18:10];
+            break;
+        end
+        else begin
+            spince_on = 1'b0;
         end
     end
+end
+
+//    always_comb
+//    begin
+//        spince_flag = 1'b0;
+//        if (spince_flag == 1'b0) begin
+//            for (int i = 0; i < 6; i = i + 1) begin
+//                x_spince = info_spince[i][9:0];
+//                y_spince = info_spince[i][18:10];
+//                direction_spince = info_spince[i][20:19];
+//                if (direction_spince == 1) begin
+//                    //width:8 height:20
+//                    if ((DrawX>= x_spince-4) && (DrawX <= x_spince + 4) &&
+//                     (DrawY >= y_spince - 10) && (DrawY <= y_spince + 10)&&
+//                     (DrawY-y_spince>=4*(DrawX-x_spince-2))&&
+//                     (DrawY-y_spince>=-4*(DrawX-x_spince+2))
+//                     ) begin
+//                        spince_on = 1'b1;
+//                        spince_flag = 1'b1;
+//                        break;
+//                    end
+//                    else begin
+//                        spince_on = 1'b0;
+//                    end
+//                end
+//            end
+//        end
+//    end
 
 
     always_comb
@@ -311,10 +356,12 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
                 Green = Green_wall;
                 Blue = Blue_wall;
             end
-            else if ((spince_on == 1'b1)) begin 
-                Red = 4'hB;
-                Green = 4'h0;
-                Blue = 4'hB;
+            else if ((spince_on == 1'b1)
+            && (!(Red_spince == 4'h0 && Green_spince == 4'hE && Blue_spince == 4'h2) 
+            && !(Red_spince == 4'h2 && Green_spince == 4'hC && Blue_spince == 4'h6))) begin  
+                Red = Red_spince; //4'hB;
+                Green = Green_spince; // 4'h0;
+                Blue = Blue_spince; //4'hB;
             end
             else if ((ball_on == 1'b1 && direction == 0) 
             && (!(Red_player == 4'h0 && Green_player == 4'hF && Blue_player == 4'h1) 
@@ -351,9 +398,9 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
             end      
         end
         else if (game_state == 4'd3) begin
-            Red = Red_background;
-            Green = Green_background;
-            Blue = Blue_background;
+            Red = Red_win_screen;
+            Green = Green_win_screen;
+            Blue = Blue_win_screen;
         end
     end
     
