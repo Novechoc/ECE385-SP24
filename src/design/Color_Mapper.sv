@@ -20,6 +20,10 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
                        output logic [3:0]  Red, Green, Blue,
 
                        input  logic [3:0] game_state,
+
+                       input  logic [9:0] fireballX, fireballY, fireballS,
+                       input  logic [20:0] info_monster,
+                       input  logic fireball_exist, monster_exist,
                        
                        input  logic [28:0] info_fence[16],
                        input  logic [28:0] info_ground[16],
@@ -162,10 +166,10 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     );
     
     logic ball_on, knife_on, direction;
-    logic ground_on, ground_flag, fence_on, fence_flag, exit_on, spince_on, spince_flag;
+    logic ground_on, ground_flag, fence_on, fence_flag, exit_on, spince_on, spince_flag, fireball_on, monster_on;
     logic [9:0] x_start, y_loc, length_ground;
     logic [9:0] y_start, x_loc, length_fence;
-    logic [9:0] x_spince;
+    logic [9:0] x_spince, x_monster, y_monster;
     logic [8:0] y_spince;
     logic [2:0] direction_spince;
     //logic [9:0] y_start_exit, x_loc_exit, length_exit;
@@ -182,7 +186,8 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         direction = 1'b0;
         spince_on = 1'b0;
         spince_flag = 1'b0;
-
+        fireball_on = 1'b0;
+        monster_on = 1'b0;
     end
 	  
     int DistX, DistY, Size;
@@ -194,6 +199,9 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     assign Dist_knifeX = DrawX - KnifeX;
     assign Dist_knifeY = DrawY - KnifeY;
     assign Size_knife = Knife_size;
+
+    assign x_monster = info_monster[9:0];
+    assign y_monster = info_monster[19:10];
     
 //direction
     always_ff @(posedge Clk) begin
@@ -215,7 +223,31 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
             ball_on = 1'b1;
         else 
             ball_on = 1'b0;
-    end 
+    end
+
+//fireball
+    always_comb
+    begin:Fireball_on_proc
+        if ( (DrawX >= fireballX - fireballS) && (DrawX <= fireballX + fireballS) 
+        && (DrawY >= fireballY - fireballS) && (DrawY <= fireballY + fireballS)
+        && (fireball_exist == 1))
+            fireball_on = 1'b1;
+        else 
+            fireball_on = 1'b0;
+    end
+
+//monster
+    always_comb
+    begin:Monster_on_proc
+        if (monster_exist == 1'b1) begin
+            if (DrawX >= x_monster - 10 && DrawX <= x_monster + 10 && DrawY >= y_monster - 10 && DrawY <= y_monster + 10) begin
+                monster_on = 1'b1;
+            end
+            else begin
+                monster_on = 1'b0;
+            end
+        end
+    end
 
 //throw knife
     always_comb
@@ -346,7 +378,12 @@ end
             Blue = Blue_background;
         end
         else if (game_state == 3'd2) begin
-            if ((ground_on == 1'b1)) begin 
+            if ((fireball_on == 1'b1)) begin
+                Red = 4'hF;
+                Green = 4'h0;
+                Blue = 4'h0;
+            end
+            else if ((ground_on == 1'b1)) begin 
                 Red = Red_ground; //4'hC;
                 Green = Green_ground; //4'h7;
                 Blue = Blue_ground; //4'h0;
@@ -390,6 +427,11 @@ end
                 Red = 4'hd;
                 Green = 4'hd;
                 Blue = 4'hd;
+            end
+            else if ((monster_on == 1'b1)) begin 
+                Red = 4'hF;
+                Green = 4'h0;
+                Blue = 4'h0;
             end   
             else begin 
                 Red = Red_background;

@@ -1,9 +1,11 @@
 module world_map(
     input logic Reset, Clk,
+    input logic [9:0] BallX,
     output logic [28:0] info_ground[16],
     output logic [28:0] info_fence[16],
     output logic [9:0] info_exit[2],
-    output logic [20:0] info_spince[6]
+    output logic [20:0] info_spince[6],
+    output logic [20:0] info_monster
     );
 
     initial begin
@@ -17,7 +19,7 @@ module world_map(
 
         info_ground[2][9:0] = 240;
         info_ground[2][18:10] = 320;
-        info_ground[2][28:19] = 80;
+        info_ground[2][28:19] = 90;
 
         info_ground[3][9:0] = 365;
         info_ground[3][18:10] = 265;
@@ -82,6 +84,10 @@ module world_map(
         info_spince[2][9:0] = 160; //the x-axis of the center of the spince
         info_spince[2][18:10] = 370; //the y-axis of the center of the spince
         info_spince[2][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
+
+        info_monster[9:0] = 590; // x location
+        info_monster[19:10] = 210; // y location
+        info_monster[20] = 1; // enable
 
 
     end

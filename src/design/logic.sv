@@ -2,9 +2,9 @@ module logic_block
 (
     input logic pixel_clk,
     input logic reset,
-    input logic [9:0]  BallX, KnifeX, 
-    input logic [9:0]  BallY, KnifeY,
-    input logic [9:0]  BallS, KnifeS,
+    input logic [9:0]  BallX, KnifeX, fireballX,
+    input logic [9:0]  BallY, KnifeY, fireballY,
+    input logic [9:0]  BallS, KnifeS, fireballS,
     input logic [28:0] info_ground[16],
     input logic [28:0] info_fence[16],
     input logic [9:0]  info_exit[2],
@@ -95,10 +95,12 @@ always_comb begin
         win_the_game = 1;
     end
 // determine if the ball lose the game
+    //1 if the ball is out of the screen
     lose_the_game = 0;
     if(BallY > 479) begin
         lose_the_game = 1;
     end 
+    //2 if the ball touch the spince
     for(int i = 0; i<6; i=i+1) begin
         spinceX = info_spince[i][9:0];
         spinceY = info_spince[i][18:10];
@@ -106,6 +108,11 @@ always_comb begin
         &&  (BallY-BallS <= spinceY+1)&&(BallY+BallS>=spinceY-1)) begin
             lose_the_game = 1;
         end
+    end
+    //3 if the ball touch the fireball
+    if ((BallX+BallS >= fireballX-fireballS)&&(BallX-BallS <=fireballX-fireballS)
+    &&  (BallY+BallS >= fireballY-fireballS)&&(BallY-BallS <=fireballY+fireballS)) begin
+        lose_the_game = 1;
     end
 end
 
