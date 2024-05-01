@@ -50,6 +50,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/design/hex_driver.sv"]"\
  "[file normalize "$origin_dir/src/design/knife.sv"]"\
  "[file normalize "$origin_dir/src/design/logic.sv"]"\
+ "[file normalize "$origin_dir/src/design/monster.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player_example.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player_example_reverse.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/player/player_palette.sv"]"\
@@ -214,7 +215,6 @@ set_property -name "webtalk.modelsim_export_sim" -value "20" -objects $obj
 set_property -name "webtalk.questa_export_sim" -value "20" -objects $obj
 set_property -name "webtalk.riviera_export_sim" -value "20" -objects $obj
 set_property -name "webtalk.vcs_export_sim" -value "20" -objects $obj
-set_property -name "webtalk.xcelium_export_sim" -value "2" -objects $obj
 set_property -name "webtalk.xsim_export_sim" -value "20" -objects $obj
 set_property -name "xpm_libraries" -value "XPM_CDC XPM_FIFO XPM_MEMORY" -objects $obj
 
@@ -247,6 +247,7 @@ set files [list \
  [file normalize "${origin_dir}/src/design/hex_driver.sv"] \
  [file normalize "${origin_dir}/src/design/knife.sv"] \
  [file normalize "${origin_dir}/src/design/logic.sv"] \
+ [file normalize "${origin_dir}/src/design/monster.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player_example.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player_example_reverse.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/player/player_palette.sv"] \
@@ -331,6 +332,11 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 set file "$origin_dir/src/design/logic.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/design/monster.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
