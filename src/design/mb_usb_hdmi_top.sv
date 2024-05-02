@@ -234,7 +234,9 @@ module mb_usb_hdmi_top(
         .info_exit(info_exit_1),
         .info_spince(info_spince_1),
         .BallX(ballxsig),
-        .info_monster(info_monster_1)
+        .BallY(ballysig),
+        .info_monster(info_monster_1),
+        .monster_exist(monster_exist)
     );
 
     world_map_0 world_map_0_instance(
@@ -245,7 +247,9 @@ module mb_usb_hdmi_top(
         .info_exit(info_exit_0),
         .info_spince(info_spince_0),
         .BallX(ballxsig),
-        .info_monster(info_monster_0)
+        .BallY(ballysig),
+        .info_monster(info_monster_0),
+        .monster_exist(monster_exist)
     );
 
     logic_block logic_block_instance(

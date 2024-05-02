@@ -11,7 +11,7 @@ module monster(
 logic [9:0] playerX, playerY;
 logic [9:0] stepX, stepY;
 logic knife_can_attack, monster_enable;
-logic [3:0] monster_life_counter;
+logic [4:0] monster_life_counter;
 logic [9:0] monsterX, monsterY;
 assign monsterX = info_monster[9:0];
 assign monsterY = info_monster[19:10];
@@ -21,8 +21,9 @@ logic [1:0] attack_state;
 // 0: player is not in range，try to locate the player
 // 1: player is in range, preparing to attack
 // 2: player is in range, attacking
-
-assign fireballS = 8;
+logic [4:0] monster_life_value;
+assign monster_life_value = 10;
+assign fireballS = 10;
 
 initial begin
     attack_state = 2'b00;
@@ -41,7 +42,7 @@ always_ff @(posedge frame_clk) begin // monster movement
         else if (knifeX >= monsterX -5 && knifeX <= monsterX + 5  && knifeY >= monsterY - 30 && knifeY <= monsterY + 30) begin
             knife_can_attack <= 0;
             monster_life_counter <= monster_life_counter + 1;
-            if (monster_life_counter == 4'd4) begin
+            if (monster_life_counter == monster_life_value) begin
                 monster_exist <= 0;
                 monster_life_counter <= 0;
             end
@@ -62,11 +63,14 @@ always_ff @(posedge frame_clk) begin // monster attack
                 playerX <= BallX;
                 playerY <= BallY;
                 stepX <= 1;
-                if (playerY - monsterY >= 0) begin // below
-                    stepY <= (playerY - monsterY)/(monsterX - playerX) * stepX;
+                if(monster_life_counter > monster_life_value/2)begin
+                    stepX <= 2;
                 end
-                else begin
-                    stepY <= (monsterY - playerY)/(monsterX - playerX) * stepX;
+                if (playerY - monsterY >= 0) begin // below
+                    stepY <= (playerY - monsterY)* stepX /(monsterX - playerX);
+                end
+                else if (monsterY - playerY >= 0) begin // up
+                    stepY <= (monsterY - playerY)* stepX /(monsterX - playerX);
                 end
             end
         end
@@ -81,10 +85,10 @@ always_ff @(posedge frame_clk) begin // monster attack
             if (playerY - monsterY >= 0) begin // below
                 fireballY <=  fireballY + stepY;
             end
-            else begin
-                fireballY <=  fireballY + stepY;
+            else if (monsterY - playerY >= 0) begin
+                fireballY <=  fireballY - stepY;
             end
-            if ((fireballX <= 200) || (fireballY <= 0) || (fireballY >= 480) ) begin
+            if ((fireballX <= 200) || (fireballY <= 0) || (fireballY >= 480) || (monster_exist == 0) ) begin
                 fireball_exist <= 0;
                 attack_state <= 2'b00;
             end

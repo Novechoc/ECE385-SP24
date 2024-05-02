@@ -42,7 +42,7 @@ always_comb begin
         x_start = info_ground[i][9:0];
         y_loc = info_ground[i][18:10];
         length_ground = info_ground[i][28:19];
-        if ((BallX - 4*BallS/5<= x_start + length_ground) && (BallX + 4*BallS/5 >= x_start)) begin
+        if ((BallX - 2*BallS/5<= x_start + length_ground) && (BallX + 2*BallS/5 >= x_start)) begin
             if ((BallY + BallS> y_loc) && (BallY - BallS < y_loc)) begin
                 if ((BallY <= y_loc + 2 * BallS / 5) && go_up == 0) begin //3
                     touch_down = 1;
@@ -65,7 +65,7 @@ always_comb begin
         length_fence = info_fence[j][28:19];
         if ((BallY - 4*BallS/5 <= y_start + length_fence) && (BallY + 4*BallS/5 >= y_start)) begin
             if ((BallX + BallS > x_loc) && (BallX - BallS < x_loc)) begin
-                if ((BallX <= x_loc + 4 * BallS / 5) && go_left == 0) begin
+                if ((BallX <= x_loc + 7 * BallS / 8)) begin
                     touch_right = 1;
                     touch_right_position_x = x_loc - BallS;
                 end

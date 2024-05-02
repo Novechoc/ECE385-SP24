@@ -1,11 +1,11 @@
-module spince_example (
+module dragon_example (
 	input logic vga_clk,
-	input logic [9:0] DrawX, DrawY,
+	input logic [9:0] DrawX, DrawY, DragonX, DragonY,
 	input logic blank,
 	output logic [3:0] red, green, blue
 );
 
-logic [7:0] rom_address;
+logic [12:0] rom_address;
 logic [2:0] rom_q;
 
 logic [3:0] palette_red, palette_green, palette_blue;
@@ -17,7 +17,7 @@ assign negedge_vga_clk = ~vga_clk;
 
 // address into the rom = (x*xDim)/640 + ((y*yDim)/480) * xDim
 // this will stretch out the sprite across the entire screen
-assign rom_address = DrawX + DrawY * 10;
+assign rom_address = (DrawX + 45 - DragonX) + (DrawY + 45 - DragonY) * 90;
 
 always_ff @ (posedge vga_clk) begin
 	red <= 4'h0;
@@ -31,13 +31,13 @@ always_ff @ (posedge vga_clk) begin
 	end
 end
 
-spince_rom spince_rom (
+dragon_rom dragon_rom (
 	.clka   (negedge_vga_clk),
 	.addra (rom_address),
 	.douta       (rom_q)
 );
 
-spince_palette spince_palette (
+dragon_palette dragon_palette (
 	.index (rom_q),
 	.red   (palette_red),
 	.green (palette_green),

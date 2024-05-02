@@ -28,6 +28,8 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/start_screen_rom/start_screen_rom.xci"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/win_screen_rom/win_screen_rom.xci"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/spince_rom/spince_rom.xci"]"\
+ "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/dragon_rom/dragon_rom.xci"]"\
+ "[file normalize "$origin_dir/vivado_project/final_project.srcs/sources_1/ip/fireball_rom/fireball_rom.xci"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/utils_1/imports/synth_1/mb_usb_hdmi_top.dcp"]"\
   ]
   foreach ifile $files {
@@ -45,6 +47,10 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/design/ball.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/door/door_example.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/door/door_palette.sv"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/dragon/dragon_example.sv"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/dragon/dragon_palette.sv"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/fireball/fireball_example.sv"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/fireball/fireball_palette.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/ground/ground_example.sv"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/ground/ground_palette.sv"]"\
  "[file normalize "$origin_dir/src/design/hex_driver.sv"]"\
@@ -75,6 +81,8 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/tool/Image_to_COE/start_screen/start_screen.COE"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/win_screen/win_screen.COE"]"\
  "[file normalize "$origin_dir/src/tool/Image_to_COE/spince/spince.COE"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/dragon/dragon.COE"]"\
+ "[file normalize "$origin_dir/src/tool/Image_to_COE/fireball/fireball.COE"]"\
  "[file normalize "$origin_dir/vivado_project/final_project.srcs/constrs_1/imports/pin_assignment/mb_usb_hdmi_top.xdc"]"\
   ]
   foreach ifile $files {
@@ -210,12 +218,13 @@ set_property -name "simulator.xsim_gcc_version" -value "6.2.0" -objects $obj
 set_property -name "simulator.xsim_version" -value "2022.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
-set_property -name "webtalk.activehdl_export_sim" -value "20" -objects $obj
-set_property -name "webtalk.modelsim_export_sim" -value "20" -objects $obj
-set_property -name "webtalk.questa_export_sim" -value "20" -objects $obj
-set_property -name "webtalk.riviera_export_sim" -value "20" -objects $obj
-set_property -name "webtalk.vcs_export_sim" -value "20" -objects $obj
-set_property -name "webtalk.xsim_export_sim" -value "20" -objects $obj
+set_property -name "webtalk.activehdl_export_sim" -value "24" -objects $obj
+set_property -name "webtalk.modelsim_export_sim" -value "24" -objects $obj
+set_property -name "webtalk.questa_export_sim" -value "24" -objects $obj
+set_property -name "webtalk.riviera_export_sim" -value "24" -objects $obj
+set_property -name "webtalk.vcs_export_sim" -value "24" -objects $obj
+set_property -name "webtalk.xcelium_export_sim" -value "4" -objects $obj
+set_property -name "webtalk.xsim_export_sim" -value "24" -objects $obj
 set_property -name "xpm_libraries" -value "XPM_CDC XPM_FIFO XPM_MEMORY" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
@@ -242,6 +251,10 @@ set files [list \
  [file normalize "${origin_dir}/src/design/ball.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/door/door_example.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/door/door_palette.sv"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/dragon/dragon_example.sv"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/dragon/dragon_palette.sv"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/fireball/fireball_example.sv"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/fireball/fireball_palette.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/ground/ground_example.sv"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/ground/ground_palette.sv"] \
  [file normalize "${origin_dir}/src/design/hex_driver.sv"] \
@@ -272,6 +285,8 @@ set files [list \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/start_screen/start_screen.COE"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/win_screen/win_screen.COE"] \
  [file normalize "${origin_dir}/src/tool/Image_to_COE/spince/spince.COE"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/dragon/dragon.COE"] \
+ [file normalize "${origin_dir}/src/tool/Image_to_COE/fireball/fireball.COE"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -307,6 +322,26 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 set file "$origin_dir/src/tool/Image_to_COE/door/door_palette.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/tool/Image_to_COE/dragon/dragon_example.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/tool/Image_to_COE/dragon/dragon_palette.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/tool/Image_to_COE/fireball/fireball_example.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/tool/Image_to_COE/fireball/fireball_palette.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -632,6 +667,48 @@ set added_files [add_files -fileset sources_1 $files]
 
 # Set 'sources_1' fileset file properties for local files
 set file "spince_rom/spince_rom.xci"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+
+# Set 'sources_1' fileset object
+set obj [get_filesets sources_1]
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/ip/dragon_rom/dragon_rom.xci" ]\
+]
+set added_files [add_files -fileset sources_1 $files]
+
+# Set 'sources_1' fileset file properties for remote files
+# None
+
+# Set 'sources_1' fileset file properties for local files
+set file "dragon_rom/dragon_rom.xci"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+
+# Set 'sources_1' fileset object
+set obj [get_filesets sources_1]
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/final_project.srcs/sources_1/ip/fireball_rom/fireball_rom.xci" ]\
+]
+set added_files [add_files -fileset sources_1 $files]
+
+# Set 'sources_1' fileset file properties for remote files
+# None
+
+# Set 'sources_1' fileset file properties for local files
+set file "fireball_rom/fireball_rom.xci"
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
 set_property -name "registered_with_manager" -value "1" -objects $file_obj

@@ -67,7 +67,15 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     logic [9:0] spinceX, spinceY;
     logic [3:0] Red_spince;
     logic [3:0] Green_spince;
-    logic [3:0] Blue_spince;     
+    logic [3:0] Blue_spince;  
+    
+    logic [3:0] Red_monster;
+    logic [3:0] Green_monster;
+    logic [3:0] Blue_monster;   
+    
+    logic [3:0] Red_fireball;
+    logic [3:0] Green_fireball;
+    logic [3:0] Blue_fireball;     
     
     background_example background_example_inst(
         .vga_clk(Clk),
@@ -155,6 +163,30 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .blue(Blue_door)
     );
     
+    dragon_example dragon_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .DragonX(info_monster[9:0]),
+        .DragonY(info_monster[18:10]),
+        .blank(vde),
+        .red(Red_monster),
+        .green(Green_monster),
+        .blue(Blue_monster)
+    );
+    
+    fireball_example fireball_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .FireballX(fireballX),
+        .FireballY(fireballY),
+        .blank(vde),
+        .red(Red_fireball),
+        .green(Green_fireball),
+        .blue(Blue_fireball)
+    );
+    
     spince_example spince_example_inst(
         .vga_clk(Clk),
         .DrawX(spinceX),
@@ -240,7 +272,7 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     always_comb
     begin:Monster_on_proc
         if (monster_exist == 1'b1) begin
-            if (DrawX >= x_monster - 10 && DrawX <= x_monster + 10 && DrawY >= y_monster - 10 && DrawY <= y_monster + 10) begin
+            if (DrawX >= x_monster - 42 && DrawX <= x_monster + 45 && DrawY >= y_monster - 44 && DrawY <= y_monster + 45) begin
                 monster_on = 1'b1;
             end
             else begin
@@ -316,10 +348,10 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
 
 always_comb begin
     for (int i = 0; i < 6; i = i + 1) begin
-        if ((DrawX >= info_spince[i][9:0] - 3) && (DrawX <= info_spince[i][9:0] + 4) 
+        if ((DrawX >= info_spince[i][9:0] - 4) && (DrawX <= info_spince[i][9:0] + 5) 
         && (DrawY >= info_spince[i][18:10] - 7) && (DrawY <= info_spince[i][18:10] + 7)) begin
             spince_on = 1'b1;
-            spinceX = DrawX + 5 - info_spince[i][9:0];
+            spinceX = DrawX + 4 - info_spince[i][9:0];
             spinceY = DrawY + 7 - info_spince[i][18:10];
             break;
         end
@@ -378,10 +410,12 @@ end
             Blue = Blue_background;
         end
         else if (game_state == 3'd2) begin
-            if ((fireball_on == 1'b1)) begin
-                Red = 4'hF;
-                Green = 4'h0;
-                Blue = 4'h0;
+            if ((fireball_on == 1'b1)
+            && (!(Red_fireball == 4'h0 && Green_fireball == 4'hC && Blue_fireball == 4'h2) 
+            && !(Red_fireball == 4'h3 && Green_fireball == 4'hA && Blue_fireball == 4'h3))) begin  
+                Red = Red_fireball;
+                Green = Green_fireball;
+                Blue = Blue_fireball;
             end
             else if ((ground_on == 1'b1)) begin 
                 Red = Red_ground; //4'hC;
@@ -394,8 +428,8 @@ end
                 Blue = Blue_wall;
             end
             else if ((spince_on == 1'b1)
-            && (!(Red_spince == 4'h0 && Green_spince == 4'hE && Blue_spince == 4'h2) 
-            && !(Red_spince == 4'h2 && Green_spince == 4'hC && Blue_spince == 4'h6))) begin  
+            && (!(Red_spince == 4'h3 && Green_spince == 4'h8 && Blue_spince == 4'h7) 
+            && !(Red_spince == 4'h0 && Green_spince == 4'hB && Blue_spince == 4'h3))) begin  
                 Red = Red_spince; //4'hB;
                 Green = Green_spince; // 4'h0;
                 Blue = Blue_spince; //4'hB;
@@ -428,10 +462,12 @@ end
                 Green = 4'hd;
                 Blue = 4'hd;
             end
-            else if ((monster_on == 1'b1)) begin 
-                Red = 4'hF;
-                Green = 4'h0;
-                Blue = 4'h0;
+            else if ((monster_on == 1'b1)
+            && (!(Red_monster == 4'h0 && Green_monster == 4'hB && Blue_monster == 4'h2) &&
+            !(Red_monster == 4'h0 && Green_monster == 4'h6 && Blue_monster == 4'h2))) begin  
+                Red = Red_monster;
+                Green = Green_monster;
+                Blue = Blue_monster;
             end   
             else begin 
                 Red = Red_background;

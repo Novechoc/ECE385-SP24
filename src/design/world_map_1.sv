@@ -1,7 +1,8 @@
 module world_map_0(
     input logic Reset, Clk,
     output logic [28:0] info_ground[16],
-    input logic [9:0] BallX,
+    input logic [9:0] BallX,BallY,
+    input logic monster_exist,
     output logic [28:0] info_fence[16],
     output logic [9:0] info_exit[2],
     output logic [20:0] info_spince[6],
@@ -23,15 +24,15 @@ initial begin
 
         info_ground[3][9:0] = 410;
         info_ground[3][18:10] = 220; //show a spince
-        info_ground[3][28:19] = 100;
+        info_ground[3][28:19] = 120;
 
-        info_ground[4][9:0] = 520;
+        info_ground[4][9:0] = 540;
         info_ground[4][18:10] = 150;
         info_ground[4][28:19] = 120;
         
         info_ground[5][9:0] = 100; // x_start
         info_ground[5][18:10] = 400; // y_loc
-        info_ground[5][28:19] = 78; // length
+        info_ground[5][28:19] = 98; // length
 
         // Simplified fences
         info_fence[0][8:0] = 0; // y_start
@@ -52,7 +53,7 @@ initial begin
         
         // Spinces
         info_spince[0][9:0] = 80; //the x-axis of the center of the spince
-        info_spince[0][18:10] = 395; //the y-axis of the center of the spince
+        info_spince[0][18:10] = 400; //the y-axis of the center of the spince
         info_spince[0][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
 
         // info_spince[1][9:0] = ; //the x-axis of the center of the spince
@@ -86,6 +87,11 @@ end
             if(BallX > 420)begin
                 info_spince[1][9:0] = 460; 
                 info_spince[1][18:10] = 210; 
+                info_spince[1][20:19] = 1; 
+            end
+            else begin
+                info_spince[1][9:0] = 460; 
+                info_spince[1][18:10] = 230; 
                 info_spince[1][20:19] = 1; 
             end
         end

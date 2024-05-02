@@ -1,6 +1,7 @@
 module world_map(
     input logic Reset, Clk,
-    input logic [9:0] BallX,
+    input logic [9:0] BallX, BallY,
+    input logic monster_exist,
     output logic [28:0] info_ground[16],
     output logic [28:0] info_fence[16],
     output logic [9:0] info_exit[2],
@@ -41,14 +42,13 @@ module world_map(
         // info_ground[9][18:10] = 135;
         // info_ground[9][28:19] = 60;
 
-        info_ground[6][9:0] = 105;
+        info_ground[6][9:0] = 95;
         info_ground[6][18:10] = 110;
-        info_ground[6][28:19] = 60;
+        info_ground[6][28:19] = 75;
 
         info_ground[8][9:0] = 0;   // door 
         info_ground[8][18:10] = 42;
         info_ground[8][28:19] = 50;
-
 
         info_fence[0][8:0] = 382; //y_start
         info_fence[0][18:9] = 102; //x_loc
@@ -85,8 +85,8 @@ module world_map(
         info_spince[2][18:10] = 370; //the y-axis of the center of the spince
         info_spince[2][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
 
-        info_monster[9:0] = 590; // x location
-        info_monster[19:10] = 210; // y location
+        info_monster[9:0] = 587; // x location
+        info_monster[19:10] = 212; // y location
         info_monster[20] = 1; // enable
 
 
@@ -103,6 +103,15 @@ module world_map(
         info_ground[9][9:0] <= 180;      //maybe special
         info_ground[9][18:10] <= 135;
         info_ground[9][28:19] <= 60;
+
+        info_ground[10][9:0] = 120;     //also fake hhh
+        info_ground[10][18:10] = 270;
+        info_ground[10][28:19] = 80; 
+        
+        info_ground[4][9:0] = 370;
+        info_ground[4][18:10] = 160;
+        info_ground[4][28:19] = 50;
+        
         end
         else begin
             if(info_ground[9][9:0] <=180) begin
@@ -125,6 +134,29 @@ module world_map(
             else begin
                 special_ground_speed <= 1;
                 info_ground[9][9:0] <= info_ground[9][9:0] - special_ground_speed;
+            end
+
+            if((BallX<170)&&(BallY<270))begin
+                info_ground[10][9:0] = 0;     //also fake hhh
+                info_ground[10][18:10] = 0;
+                info_ground[10][28:19] = 0; 
+            end
+            else if (BallX > 210) begin
+                info_ground[10][9:0] = 120;     //also fake hhh
+                info_ground[10][18:10] = 270;
+                info_ground[10][28:19] = 80; 
+            end
+            
+            if (monster_exist == 0) begin
+                info_ground[4][9:0] = 370;
+                info_ground[4][18:10] = 160;
+                info_ground[4][28:19] = 50;
+            end
+            else begin
+                info_ground[4][9:0] = 370;
+                info_ground[4][18:10] = 60;
+                info_ground[4][28:19] = 50;
+            
             end
         end
     
