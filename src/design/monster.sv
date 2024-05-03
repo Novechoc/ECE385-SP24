@@ -5,13 +5,15 @@ module monster(
     input logic [9:0] knifeX, knifeY,
     input logic [3:0] game_state,
     output logic [9:0] fireballX, fireballY, fireballS,
-    output logic fireball_exist, monster_exist
+    output logic fireball_exist, monster_exist,
+    output logic [5:0] monster_life_counter,
+    output logic [5:0] monster_life_value
     );
 
 logic [9:0] playerX, playerY;
 logic [9:0] stepX, stepY;
 logic knife_can_attack, monster_enable;
-logic [4:0] monster_life_counter;
+logic [5:0] monster_life_counter;
 logic [9:0] monsterX, monsterY;
 assign monsterX = info_monster[9:0];
 assign monsterY = info_monster[19:10];
@@ -21,8 +23,7 @@ logic [1:0] attack_state;
 // 0: player is not in range，try to locate the player
 // 1: player is in range, preparing to attack
 // 2: player is in range, attacking
-logic [4:0] monster_life_value;
-assign monster_life_value = 10;
+logic [5:0] monster_life_value;
 assign fireballS = 10;
 
 initial begin
@@ -31,6 +32,7 @@ initial begin
     monster_exist = 1;
     knife_can_attack = 0;
     monster_life_counter = 0;
+    monster_life_value = 10;
 end
 
 always_ff @(posedge frame_clk) begin // monster movement
@@ -39,7 +41,7 @@ always_ff @(posedge frame_clk) begin // monster movement
          && (knifeY >= BallY - BallS) && (knifeY <= BallY + BallS)) begin
             knife_can_attack <= 1;
         end
-        else if (knifeX >= monsterX -5 && knifeX <= monsterX + 5  && knifeY >= monsterY - 30 && knifeY <= monsterY + 30) begin
+        else if (knifeX >= monsterX -2 && knifeX <= monsterX + 3  && knifeY >= monsterY - 30 && knifeY <= monsterY + 30) begin
             knife_can_attack <= 0;
             monster_life_counter <= monster_life_counter + 1;
             if (monster_life_counter == monster_life_value) begin
@@ -62,9 +64,9 @@ always_ff @(posedge frame_clk) begin // monster attack
                 attack_state = 2'b01;
                 playerX <= BallX;
                 playerY <= BallY;
-                stepX <= 1;
+                stepX <= 2;
                 if(monster_life_counter > monster_life_value/2)begin
-                    stepX <= 2;
+                    stepX <= 3;
                 end
                 if (playerY - monsterY >= 0) begin // below
                     stepY <= (playerY - monsterY)* stepX /(monsterX - playerX);

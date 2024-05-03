@@ -8,18 +8,21 @@ module world_selector
     input logic [9:0] info_exit_0[2],
     input logic [20:0] info_spince_0[6],
     input logic [20:0] info_monster_0,
+    input logic [20:0] info_charge_0[2],
 
     input logic [28:0] info_ground_1[16],
     input logic [28:0] info_fence_1[16],
     input logic [9:0] info_exit_1[2],
     input logic [20:0] info_spince_1[6],
     input logic [20:0] info_monster_1,
+    input logic [20:0] info_charge_1[2],
 
     output logic [28:0] info_ground[16],
     output logic [28:0] info_fence[16],
     output logic [9:0] info_exit[2],
     output logic [20:0] info_spince[6],
-    output logic [20:0] info_monster
+    output logic [20:0] info_monster,
+    output logic [20:0] info_charge[2]
 );
 
     always_comb begin
@@ -29,6 +32,7 @@ module world_selector
             info_exit = info_exit_0;
             info_spince = info_spince_0;
             info_monster = info_monster_0;
+            info_charge = info_charge_0;
         end
         else if (selector_value == 2'b01) begin
             info_ground = info_ground_1;
@@ -36,6 +40,7 @@ module world_selector
             info_exit = info_exit_1;
             info_spince = info_spince_1;
             info_monster = info_monster_1;
+            info_charge = info_charge_1;
         end
     end
 

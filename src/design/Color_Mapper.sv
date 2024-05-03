@@ -24,11 +24,13 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
                        input  logic [9:0] fireballX, fireballY, fireballS,
                        input  logic [20:0] info_monster,
                        input  logic fireball_exist, monster_exist,
-                       
+                       input  logic [5:0] monster_life_counter,
+                       input  logic [5:0] monster_life_value,
                        input  logic [28:0] info_fence[16],
                        input  logic [28:0] info_ground[16],
                        input  logic [9:0] info_exit[2],
-                       input  logic [20:0] info_spince[6]);
+                       input  logic [20:0] info_spince[6],
+                       input  logic [20:0] info_charge[2]);
                        
                        
     logic [3:0] Red_background;
@@ -75,7 +77,13 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     
     logic [3:0] Red_fireball;
     logic [3:0] Green_fireball;
-    logic [3:0] Blue_fireball;     
+    logic [3:0] Blue_fireball;
+    
+    logic [9:0] lightningX = info_charge[0][9:0];
+    logic [9:0] lightningY = info_charge[0][19:10];
+    logic [3:0] Red_lightning;
+    logic [3:0] Green_lightning;
+    logic [3:0] Blue_lightning;       
     
     background_example background_example_inst(
         .vga_clk(Clk),
@@ -163,12 +171,24 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .blue(Blue_door)
     );
     
+    lightning_example lightning_example_inst(
+        .vga_clk(Clk),
+        .DrawX(DrawX),
+        .DrawY(DrawY),
+        .LightningX(lightningX),
+        .LightningY(lightningY),
+        .blank(vde),
+        .red(Red_lightning),
+        .green(Green_lightning),
+        .blue(Blue_lightning)
+    );
+    
     dragon_example dragon_example_inst(
         .vga_clk(Clk),
         .DrawX(DrawX),
         .DrawY(DrawY),
         .DragonX(info_monster[9:0]),
-        .DragonY(info_monster[18:10]),
+        .DragonY(info_monster[19:10]),
         .blank(vde),
         .red(Red_monster),
         .green(Green_monster),
@@ -197,7 +217,7 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         .blue(Blue_spince)
     );
     
-    logic ball_on, knife_on, direction;
+    logic ball_on, knife_on, direction, blood_on, charge_on;
     logic ground_on, ground_flag, fence_on, fence_flag, exit_on, spince_on, spince_flag, fireball_on, monster_on;
     logic [9:0] x_start, y_loc, length_ground;
     logic [9:0] y_start, x_loc, length_fence;
@@ -205,7 +225,8 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
     logic [8:0] y_spince;
     logic [2:0] direction_spince;
     //logic [9:0] y_start_exit, x_loc_exit, length_exit;
-
+    logic [6:0] blood_left_to_show;
+    
 
     initial begin
         ball_on = 1'b0;
@@ -220,6 +241,8 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
         spince_flag = 1'b0;
         fireball_on = 1'b0;
         monster_on = 1'b0;
+        blood_on = 1'b0;
+        charge_on = 1'b0;
     end
 	  
     int DistX, DistY, Size;
@@ -271,7 +294,7 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
 //monster
     always_comb
     begin:Monster_on_proc
-        if (monster_exist == 1'b1) begin
+        if ((monster_exist == 1'b1)&&(info_monster[20]==1)) begin
             if (DrawX >= x_monster - 42 && DrawX <= x_monster + 45 && DrawY >= y_monster - 44 && DrawY <= y_monster + 45) begin
                 monster_on = 1'b1;
             end
@@ -280,7 +303,24 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
             end
         end
     end
-
+//blood
+assign blood_left_to_show = monster_life_value - monster_life_counter;
+    always_comb
+    begin:Blood_on_proc
+        if ((monster_exist == 1'b1)&&(blood_left_to_show>=0)
+        &&(info_monster[20]==1) )begin
+            if((DrawX >= 552)&&(DrawX <= 552+blood_left_to_show*8)&&
+            (DrawY >= 0)&&(DrawY <= 8)) begin
+                blood_on = 1'b1;
+            end
+            else begin
+                blood_on = 1'b0;
+            end
+        end
+        else begin
+            blood_on = 1'b0;
+        end
+    end
 //throw knife
     always_comb
     begin:Knife_on_proc
@@ -301,6 +341,18 @@ module  color_mapper ( input  logic Clk, vde, go_left, go_right,
             exit_on = 1'b0;
         end
     end 
+
+//charge
+    always_comb begin
+        if((DrawX >= info_charge[0][9:0]-10) && (DrawX <= info_charge[0][9:0]+10)
+        && (DrawY >= info_charge[0][18:10]-10) && (DrawY <= info_charge[0][18:10]+10)&&
+        (info_charge[0][20]==1)) begin
+            charge_on = 1'b1;
+        end
+        else begin
+            charge_on = 1'b0;
+        end
+    end
 
 //ground
     always_comb 
@@ -360,6 +412,7 @@ always_comb begin
         end
     end
 end
+
 
 //    always_comb
 //    begin
@@ -434,6 +487,13 @@ end
                 Green = Green_spince; // 4'h0;
                 Blue = Blue_spince; //4'hB;
             end
+            else if((charge_on == 1'b1)
+            && (!(Red_lightning == 4'h0 && Green_lightning == 4'hC && Blue_lightning == 4'h2) 
+            && !(Red_lightning == 4'h3 && Green_lightning == 4'hC && Blue_lightning == 4'h2))) begin 
+                Red = Red_lightning;
+                Green = Green_lightning;
+                Blue = Blue_lightning;
+            end
             else if ((ball_on == 1'b1 && direction == 0) 
             && (!(Red_player == 4'h0 && Green_player == 4'hF && Blue_player == 4'h1) 
             && !(Red_player == 4'h3 && Green_player == 4'hB && Blue_player == 4'h3)
@@ -461,6 +521,11 @@ end
                 Red = 4'hd;
                 Green = 4'hd;
                 Blue = 4'hd;
+            end
+            else if(blood_on == 1'b1) begin
+                Red = 4'hE;
+                Green = 4'h0;
+                Blue = 4'h0;
             end
             else if ((monster_on == 1'b1)
             && (!(Red_monster == 4'h0 && Green_monster == 4'hB && Blue_monster == 4'h2) &&

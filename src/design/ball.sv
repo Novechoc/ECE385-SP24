@@ -27,7 +27,7 @@ module  ball
     input  logic touch_down, touch_up, touch_left, touch_right,
     input  logic [9:0] touch_down_position_y, touch_left_position_x,
     input  logic [9:0] touch_up_position_y, touch_right_position_x,
-
+    input  logic get_charged,
     output logic [9:0]  BallX, 
     output logic [9:0]  BallY, 
     output logic [9:0]  BallS,
@@ -80,13 +80,21 @@ module  ball
 
         //modify to control ball motion with the keycode
         if (keycode1 == 8'h07 || keycode2 == 8'h07 || keycode3 == 8'h07 || keycode4 == 8'h07) begin
-            Ball_X_Motion_next = 10'd1;
+            
+            if(get_charged == 1) begin
+                Ball_X_Motion_next = 10'd2;
+            end else begin
+                Ball_X_Motion_next = 10'd1;
+            end
             go_up = 0;
             go_left = 0;
             go_right = 1;
         end
         else if (keycode1 == 8'h04 || keycode2 == 8'h04 || keycode3 == 8'h04 || keycode4 == 8'h04) begin
             Ball_X_Motion_next = -10'd1;
+            if(get_charged == 1) begin
+                Ball_X_Motion_next = -10'd2;
+            end
             go_up = 0;
             go_left = 1; 
             go_right = 0;

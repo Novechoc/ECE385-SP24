@@ -5,13 +5,15 @@ module logic_block
     input logic [9:0]  BallX, KnifeX, fireballX,
     input logic [9:0]  BallY, KnifeY, fireballY,
     input logic [9:0]  BallS, KnifeS, fireballS,
+    input logic [3:0]  game_state,
     input logic [28:0] info_ground[16],
     input logic [28:0] info_fence[16],
     input logic [9:0]  info_exit[2],
     input logic [20:0] info_spince[6],
-    input logic go_up, go_left, go_right,
+    input logic [20:0] info_charge[2],
+    input logic go_up, go_left, go_right, fireball_exist,
     output logic logic_in_air, win_the_game, lose_the_game,
-    output logic touch_down, touch_up, touch_left, touch_right, knife_touch_fence,
+    output logic touch_down, touch_up, touch_left, touch_right, knife_touch_fence, get_charged,
     output logic [9:0] touch_down_position_y, touch_left_position_x, 
     output logic [9:0] touch_up_position_y, touch_right_position_x
 );
@@ -20,6 +22,9 @@ logic [9:0] x_start, y_start;
 logic [9:0] y_loc, x_loc;
 logic [9:0] length_ground, length_fence;
 logic [9:0] spinceX, spinceY;
+initial begin
+    get_charged = 0;
+end
 always_comb begin
     // determine if the ball is in the air
     logic_in_air = 1;
@@ -65,7 +70,7 @@ always_comb begin
         length_fence = info_fence[j][28:19];
         if ((BallY - 4*BallS/5 <= y_start + length_fence) && (BallY + 4*BallS/5 >= y_start)) begin
             if ((BallX + BallS > x_loc) && (BallX - BallS < x_loc)) begin
-                if ((BallX <= x_loc + 7 * BallS / 8)) begin
+                if ((BallX <= x_loc + 3* BallS / 5)) begin
                     touch_right = 1;
                     touch_right_position_x = x_loc - BallS;
                 end
@@ -88,6 +93,7 @@ always_comb begin
             end
         end
     end
+
 // determine if the ball is touching the exit
     win_the_game = 0;
     if((BallX  >= info_exit[0]-10) && (BallX <= info_exit[0]+10) 
@@ -107,12 +113,26 @@ always_comb begin
         if ((BallX-BallS <= 2+spinceX)&&(BallX+BallS >=spinceX-2)
         &&  (BallY-BallS <= spinceY+1)&&(BallY+BallS>=spinceY-1)) begin
             lose_the_game = 1;
+            
         end
     end
     //3 if the ball touch the fireball
     if ((BallX+BallS >= fireballX-fireballS)&&(BallX-BallS <=fireballX-fireballS)
-    &&  (BallY+BallS >= fireballY-fireballS)&&(BallY-BallS <=fireballY+fireballS)) begin
+    &&  (BallY+BallS >= fireballY-fireballS)&&(BallY-BallS <=fireballY+fireballS)
+    &&(BallX>200)&&(fireball_exist==1)) begin
         lose_the_game = 1;
+    end
+end
+
+always_ff @(posedge pixel_clk) begin
+// determine if the ball get charged(larger speed)
+    if ((BallX >= info_charge[0][9:0]-10) && (BallX <= info_charge[0][9:0]+10) 
+    && (BallY >= info_charge[0][18:10]-10) && (BallY <= info_charge[0][18:10]+10)
+    &&(info_charge[0][20]==1)) begin
+        get_charged = 1;
+    end
+    else if (game_state != 4'd2) begin
+        get_charged = 0;
     end
 end
 

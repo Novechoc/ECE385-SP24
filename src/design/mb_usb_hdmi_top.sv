@@ -48,6 +48,7 @@ module mb_usb_hdmi_top(
     logic hsync, vsync, vde;
     logic [3:0] red, green, blue;
     logic reset_ah;
+    logic get_charged; //ball get charged or not(larger speed if get charged)
 
     //World Map
     logic [28:0] info_ground[16], info_ground_0[16], info_ground_1[16];
@@ -55,6 +56,7 @@ module mb_usb_hdmi_top(
     logic [9:0] info_exit[2], info_exit_0[2], info_exit_1[2];
     logic [20:0] info_spince[6], info_spince_0[6], info_spince_1[6];
     logic [20:0] info_monster, info_monster_0, info_monster_1;
+    logic [20:0] info_charge[2], info_charge_0[2], info_charge_1[2];
 
     //Logic Block
     logic logic_in_air;
@@ -71,9 +73,9 @@ module mb_usb_hdmi_top(
 
     //monster
     logic monster_exist, fireball_exist;
-
+    logic [5:0] monster_life_counter;
     assign reset_ah = reset_rtl_0;
-    
+    logic [5:0] monster_life_value;
     
     //Keycode HEX drivers
     hex_driver HexA (
@@ -177,7 +179,8 @@ module mb_usb_hdmi_top(
         .touch_right_position_x(touch_right_position_x),
         .go_up(go_up),
         .go_left(go_left),
-        .go_right(go_right)
+        .go_right(go_right),
+        .get_charged(get_charged)
     );
     
     //Knife Module
@@ -208,10 +211,13 @@ module mb_usb_hdmi_top(
         .Red(red),
         .Green(green),
         .Blue(blue),
+
         .info_ground(info_ground),
         .info_fence(info_fence),
         .info_exit(info_exit),
         .info_spince(info_spince),
+        .info_charge(info_charge),
+
         .KnifeX(knifexsig),
         .KnifeY(knifeysig),
         .Knife_size(knifesizesig),
@@ -223,7 +229,9 @@ module mb_usb_hdmi_top(
         .fireballS(fireballsizesig),
         .fireball_exist(fireball_exist),
         .monster_exist(monster_exist),
-        .info_monster(info_monster)
+        .info_monster(info_monster),
+        .monster_life_counter(monster_life_counter),
+        .monster_life_value(monster_life_value)
     );
 
     world_map world_map_instance(
@@ -233,10 +241,14 @@ module mb_usb_hdmi_top(
         .info_fence(info_fence_1),
         .info_exit(info_exit_1),
         .info_spince(info_spince_1),
+        .game_state(game_state),
         .BallX(ballxsig),
         .BallY(ballysig),
         .info_monster(info_monster_1),
-        .monster_exist(monster_exist)
+        .monster_exist(monster_exist),
+        .monster_life_counter(monster_life_counter),
+        .monster_life_value(monster_life_value),
+        .info_charge(info_charge_1)
     );
 
     world_map_0 world_map_0_instance(
@@ -249,7 +261,10 @@ module mb_usb_hdmi_top(
         .BallX(ballxsig),
         .BallY(ballysig),
         .info_monster(info_monster_0),
-        .monster_exist(monster_exist)
+        .monster_exist(monster_exist),
+        .monster_life_counter(monster_life_counter),
+        .monster_life_value(monster_life_value),
+        .info_charge(info_charge_0)
     );
 
     logic_block logic_block_instance(
@@ -277,12 +292,17 @@ module mb_usb_hdmi_top(
         .touch_right_position_x(touch_right_position_x),
         .go_up(go_up),
         .go_left(go_left),
-        .go_right(go_right),
+        .go_right(go_right),    
         .win_the_game(win_the_game),
         .lose_the_game(lose_the_game),
         .fireballX(fireballxsig),
         .fireballY(fireballysig),
-        .fireballS(fireballsizesig)
+        .fireballS(fireballsizesig),
+
+        .get_charged(get_charged),
+        .info_charge(info_charge),
+        .fireball_exist(fireball_exist),
+        .game_state(game_state)
     );
 
     state_machine state_machine_instance(
@@ -305,18 +325,21 @@ module mb_usb_hdmi_top(
         .info_exit_0(info_exit_0),
         .info_spince_0(info_spince_0),
         .info_monster_0(info_monster_0),
+        .info_charge_0(info_charge_0),
         
         .info_ground_1(info_ground_1),
         .info_fence_1(info_fence_1),
         .info_exit_1(info_exit_1),
         .info_spince_1(info_spince_1),
         .info_monster_1(info_monster_1),
+        .info_charge_1(info_charge_1),
         
         .info_ground(info_ground),
         .info_fence(info_fence),
         .info_exit(info_exit),
         .info_spince(info_spince),
-        .info_monster(info_monster)
+        .info_monster(info_monster),
+        .info_charge(info_charge)
     );
 
     monster monster_instance(
@@ -333,7 +356,9 @@ module mb_usb_hdmi_top(
         .fireball_exist(fireball_exist),
         .knifeX(knifexsig),
         .knifeY(knifeysig),
-        .monster_exist(monster_exist)
+        .monster_exist(monster_exist),
+        .monster_life_counter(monster_life_counter),
+        .monster_life_value(monster_life_value)
     );
 
  

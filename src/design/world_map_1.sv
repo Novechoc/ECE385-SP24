@@ -1,12 +1,15 @@
 module world_map_0(
     input logic Reset, Clk,
-    output logic [28:0] info_ground[16],
     input logic [9:0] BallX,BallY,
     input logic monster_exist,
+    input logic [5:0] monster_life_value,
+    input logic [5:0] monster_life_counter,
+    output logic [28:0] info_ground[16],
     output logic [28:0] info_fence[16],
     output logic [9:0] info_exit[2],
     output logic [20:0] info_spince[6],
-    output logic [20:0] info_monster
+    output logic [20:0] info_monster,
+    output logic [20:0] info_charge[2]
     );
 
 initial begin
@@ -61,6 +64,8 @@ initial begin
         // info_spince[1][20:19] = 1; //the direction of the spince 0:left 1:up 2:right 3:down
 
         info_monster[20] = 0; //disables the monster
+        info_charge[0][20] = 0;
+        info_charge[1][20] = 0;
 end
 
     always_ff @(posedge Clk) begin
